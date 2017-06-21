@@ -1,0 +1,48 @@
+{
+  "name": "maths.ts",
+  "version": "0.0.1",
+  "description": "Math utilities library for TypeScript, JavaScript and Node.js",
+  "main": "./lib/maths.js",
+  "types": "./lib/maths.d.ts",
+  "scripts": {
+    "test": "mocha -r ts-node/register test/*.ts",
+    "prepublish": "grunt ts; webpack --debug; webpack -p; minify bundle/ -c",
+    "watch": "grunt watch",
+    "grunt": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IpiVasquez/maths.ts.git"
+  },
+  "keywords": [
+    "Maths",
+    "maths",
+    "TypeScript",
+    "JavaScript",
+    "Node.js",
+    "typescript",
+    "javascript",
+    "node.js"
+  ],
+  "author": "Hector J. Vasquez <ipi.vasquez@gmail.com> (http://ipivasquez.github.io/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IpiVasquez/maths.ts/issues"
+  },
+  "homepage": "https://github.com/IpiVasquez/maths.ts#readme",
+  "devDependencies": {
+    "@types/chai": "^4.0.0",
+    "@types/mocha": "^2.2.41",
+    "chai": "^4.0.2",
+    "grunt": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-exec": "^2.0.0",
+    "grunt-ts": "^6.0.0-beta.16",
+    "jsdoc": "^3.4.3",
+    "minifier": "^0.8.1",
+    "mocha": "^3.4.2",
+    "ts-node": "^3.0.6",
+    "typescript": "^2.3.4",
+    "webpack": "^3.0.0"
+  }
+}

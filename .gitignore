@@ -1,0 +1,6 @@
+# Editor files
+.idea/
+mathts.iml
+# Node files
+node_modules/
+.tscache/

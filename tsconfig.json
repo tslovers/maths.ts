@@ -1,0 +1,16 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "target": "es5",
+    "declaration": true,
+    "sourceMap": true,
+    "removeComments": false,
+    "preserveConstEnums": true,
+    "noImplicitAny": true
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "rootDir": "./src/",
+  "outDir": "./lib/"
+}

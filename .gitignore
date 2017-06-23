@@ -3,6 +3,4 @@
 mathts.iml
 # Node files
 node_modules/
-lib/
-bundle/
 .tscache/

@@ -21,14 +21,23 @@ Maths.ts is available as the `maths.ts` package on npm.
     npm install maths.ts
 
 ## Browser support 
-At this time it is not available on a CDN. So in order to use it in browser it is necessary to download from this repository at: `./bundle/maths.js` or `./bundle/maths.min.js`.
+At this time it is not available on a CDN. So in order to use it in browser it is necessary to compile it.
+ To do so you'll need to follow the next instructions:
+  
+      git clone https://github.com/IpiVasquez/maths.ts.git
+      cd maths.ts
+      npm install
+      npm run grunt
+
+These lines will create a file on maths.ts/bundle/ which will
+contain maths.js and maths.min.js, ready to use in your browser.
 
 ## Usage
 We are working on a website to upload several examples but at this time we only have a few. Here is the first one to get you started:
 
     var math = require('maths.ts');
     
-    a = math.eval('2*3'); // math.ts obj {6}
-    a.multiply(4); // math.ts obj {24}
+    a = math.eval('2*3'); // maths.ts obj {6}
+    a.multiply(4); // maths.ts obj {24}
     
 ## Documentation

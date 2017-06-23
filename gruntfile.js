@@ -15,8 +15,7 @@ module.exports = function (grunt) {
                     target: tsconfig.compilerOptions.target,
                     sourceMap: tsconfig.compilerOptions.sourceMap,
                     declaration: tsconfig.compilerOptions.declaration,
-                    rootDir: tsconfig.rootDir,
-                    jsx: 'react'
+                    rootDir: tsconfig.rootDir
                 }
             }
         },

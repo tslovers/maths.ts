@@ -1,12 +1,13 @@
 {
   "name": "maths.ts",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Math utilities library for TypeScript, JavaScript and Node.js",
   "main": "./lib/maths.js",
   "types": "./lib/maths.d.ts",
   "scripts": {
     "test": "mocha -r ts-node/register test/*.ts test/**/*.ts",
-    "prepublish": "grunt ts; webpack --debug; webpack -p; minify bundle/ -c",
+    "prepare": "grunt ts",
+    "build": "grunt ts; webpack --debug; webpack -p; minify bundle/ -c",
     "watch": "grunt watch",
     "grunt": "grunt"
   },

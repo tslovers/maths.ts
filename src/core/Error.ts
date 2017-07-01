@@ -3,3 +3,9 @@ export class InputError extends Error {
         super(message);
     }
 }
+
+export class DuplicatedKeyError extends Error {
+    constructor(m: string = 'You are trying to add an already existing key.') {
+        super(m);
+    }
+}

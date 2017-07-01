@@ -1,4 +1,6 @@
 import {InputError} from './Error';
+// import {getPrimeFactors} from '../utils';
+// import {getCommonDenominator} from "../utils/sieve";
 
 export const numberPattern = /((\d+)(\.\d+)?)|(\.\d+)/;
 export const symbolPattern = /[a-z]\w*/i;
@@ -158,15 +160,16 @@ constants.PI = constants.pi;
  *  it's subclasses. Comments on this are welcome.
  */
 export class Node {
-    protected parent: Node;
-    protected name: string;
-    protected children: Node[];
-    protected type: NodeType;
+    public children: Node[];
+    public name: string | number;
+    public parent: Node;
+    public type: NodeType;
 
     public static scope: any = {
         functions: functions,
         constants: constants,
-        operators: operators
+        operators: operators,
+        irrationals: {e: true, E: true, pi: true, PI: true}
     };
 
     /**
@@ -175,63 +178,47 @@ export class Node {
      *  expression instead of an array. The array constructor must only be used internally by this.
      * @param parent
      */
-    constructor(s: string | string[], parent?: Node) {
+    constructor(s: number | string | string[] | Node, parent?: Node) {
         this.parent = parent;
 
-        if (typeof s !== 'string' && s.length === 1)
+        if (typeof s === 'number') {
+            this.name = s;
+            this.type = NodeType.Constant;
+            return;
+        }
+
+        if (!(s instanceof Node) && typeof s !== 'string' && s.length === 1)
             s = s[0];
 
-        if (typeof s === 'string') // Is string then
+        if (s instanceof Node) {
+            this.name = typeof s.name === 'number' ? s.name : s.name.toString();
+            this.parent = s.parent;
+            this.type = s.type;
+            if (s.children !== undefined)
+                this.children = s.children.map(Node.newNode);
+        } else if (typeof s === 'string') // Is string then
             this.buildTree(this.separate(Node.formatString(s)));
         else if (s.length === 0) // Is an array with 0 elements, hence, invalid
-            throw new InputError();
+            throw new InputError('There is something wrong about your input: ' +
+                (this.parent ? this.parent.toString() : 'unknown') + '.');
         else // Is an array with 2 or more elements so skip the separating part
             this.buildTree(s);
     }
 
     /**
-     * Returns an approximate value for this if it can be solved.
-     * @return {number} The value of this if there is.
-     */
-    public getNumberValue(scope?: any): number {
-        if (this.type === NodeType.Constant)
-            return Number(this.name);
-        else if (this.type === NodeType.Symbol && Node.scope.constants[this.name] !== undefined)
-            return Node.scope.constants[this.name];
-        else if (this.type === NodeType.BinaryOperator)
-            return Node.scope.operators[this.name].fn(this.children[0], this.children[1], scope);
-        else if (this.type === NodeType.Function)
-            return Node.scope.functions[this.name].fn(this.children[0], scope);
-        else if (this.type === NodeType.Symbol && scope !== undefined && scope[this.name] !== undefined)
-            return scope[this.name];
-        return undefined;
-    }
-
-    /**
-     * Transforms the input string into a string readable for this and checks possible errors on input.
-     * Notes:
-     *  It is recommended to avoid ambiguity.
-     * @param s
+     * Prints a child according to this node operator's priority. The intention is that this.toString
+     * prints correctly the brackets needed.
+     * @param n
      * @return {string}
      */
-    private static formatString(s: string): string {
-        // This two turns expressions like: ( exp ), ( exp), (exp ) into (exp).
-        s = s.replace(/\( +/g, '(');
-        s = s.replace(/ +\)/g, ')');
-        s = s.replace(/ +\+ +/g, '+');
-        s = s.replace(/ +\* +/g, '*');
-        s = s.replace(/ +- +/g, '-');
-        s = s.replace(/ +\/ +/g, '/');
-        s = s.replace(/ +\^ +/g, '^');
-        s = s.replace(/ +/g, '*');
-        // Checks if there are empty expressions on input
-        if (s.length === 0 || s.search(/\( *\)/) >= 0)
-            throw new InputError('There cannot be empty expressions on input.');
-        // Checks there are no errors on input
-        if (s.search(/(([*+\/^-])([*+\/^-])+)|(\(([*+\/^-])+)|(([*+\/^-])+\))/) >= 0)
-            throw new Error('There are two operators that does not suppose to be together.');
+    private childString(n: number): string {
+        let child = this.children[n];
+        let thisP = Node.scope.operators[this.name].priority;
+        let childP = Node.scope.operators[child.name] !== undefined ? Node.scope.operators[child.name].priority : Infinity;
 
-        return s;
+        if (childP !== undefined && thisP >= childP && thisP === 2)
+            return '( ' + child.toString() + ' )';
+        return child.toString();
     }
 
     /**
@@ -240,7 +227,7 @@ export class Node {
      * @param children The array where to store the candidates.
      * @return {string[]} Candidate nodes.
      */
-    private separate(s: string, children: string[] = []): string[] {
+    public separate(s: string, children: string[] = []): string[] {
         let i = 0, j = s[0] === '(' ? 1 : 0;
 
         if (s.length === 0)
@@ -278,28 +265,39 @@ export class Node {
      * Builds a tree with this node as a root.
      * @param elements The elements obtained from separate.
      */
-    private buildTree(elements: string[]): void {
+    public buildTree(elements: string[]): void {
         if (elements.length === 0)
-            throw new InputError('Node cannot be built because of wrong input.');
+            throw new InputError('Node cannot be built because of wrong input: ' +
+                (this.parent ? this.parent.toString() : 'unknown') + '.');
 
         if (elements.length === 1) {
             if (elements[0][0] === '(' ||
-                (elements[0].search(/[a-z]\w*\(.*\)/i) < 0 && elements[0].search(/\/|\*|\+|-|\^/i) >= 0))
+                (elements[0].search(/-?[a-z]\w*\(.*\)/i) < 0 &&
+                elements[0].search(/\/|\*|\+|-|\^/i) >= 0 &&
+                elements[0].search(/-/i) !== 0))
+            // If this it means te expression may be separated even more despite there is only one element
                 this.buildTree(this.separate(Node.formatString(elements[0])));
             else {
+                // This expression it's ready for being a new node
                 this.name = elements[0];
                 if (elements[0].search(symbolPattern) >= 0) {
                     if (elements[0].search(/[()]/) >= 0) {
+                        // It must be a function
                         this.type = NodeType.Function;
-                        this.name = elements[0].match(symbolPattern)[0];
-                        this.children = [new Node(elements[0].substring(this.name.length, elements[0].length), this)];
+                        // As a function there are some exceptions that must be caught
+                        if (elements[0].search(/sqrt\(/) === 0) {
+                            this.buildTree(this.separate(elements[0].replace('sqrt', '(') + '^(1/2))'));
+                        } else {
+                            this.name = elements[0].match(symbolPattern)[0];
+                            this.children = [new Node(elements[0].substring(this.name.length, elements[0].length), this)];
+                        }
                     } else {
                         this.type = NodeType.Symbol;
                         this.name = elements[0];
                     }
                 } else if (elements[0].search(numberPattern) >= 0) {
                     this.type = NodeType.Constant;
-                    this.name = elements[0];
+                    this.name = Number(elements[0]);
                 } else
                     throw new InputError('WTF?');
             }
@@ -312,7 +310,8 @@ export class Node {
             }
 
             if (curOp < 0)
-                throw new InputError('Node cannot be built because of wrong input.');
+                throw new InputError('Node cannot be built because of wrong input: ' +
+                    (this.parent ? this.parent.toString() : elements) + '.');
 
             this.type = NodeType.BinaryOperator;
             this.name = elements[curOp];
@@ -324,6 +323,53 @@ export class Node {
     }
 
     /**
+     * Clones this node deeply.
+     * @return {Node} A copy of this node.
+     */
+    public clone(): Node {
+        return new Node(this.toString());
+    }
+
+    /**
+     * Returns an approximate value for this if it can be solved.
+     * @return {number} The value of this if there is.
+     */
+    public getNumberValue(scope?: any): number {
+        if (this.type === NodeType.Constant && typeof this.name === 'number')
+            return this.name;
+        else if (this.type === NodeType.Symbol && Node.scope.constants[this.name] !== undefined)
+            return Node.scope.constants[this.name];
+        else if (this.type === NodeType.BinaryOperator)
+            return Node.scope.operators[this.name].fn(this.children[0], this.children[1], scope);
+        else if (this.type === NodeType.Function)
+            return Node.scope.functions[this.name].fn(this.children[0], scope);
+        else if (this.type === NodeType.Symbol && scope !== undefined && scope[this.name] !== undefined)
+            return scope[this.name];
+        return undefined;
+    }
+
+    /**
+     * Replace a given constant in the expression.
+     * @param scope
+     */
+    public replace(scope: any): void {
+        if (this.type === NodeType.Symbol && scope[this.name] !== undefined) {
+            this.name = scope[this.name] + '';
+            let match;
+            if ((match = this.name.match(symbolPattern)) && match[0] === this.name)
+                this.type = NodeType.Symbol;
+            else if ((match = this.name.match(numberPattern)) && match[0] === this.name)
+                this.type = NodeType.Constant;
+            else
+                throw new InputError("The replacements must be a symbol or a number");
+        } else if (this.type === NodeType.BinaryOperator) {
+            this.children[0].replace(scope);
+            this.children[1].replace(scope);
+        } else if (this.type === NodeType.Function)
+            this.children[0].replace(scope);
+    }
+
+    /**
      * Prints the representation of this node as an expression by seeking on its children.toString().
      * @return {string} This node as an expression.
      */
@@ -331,9 +377,9 @@ export class Node {
         let out = '';
 
         if (this.type === NodeType.BinaryOperator)
-            out += this.childString(0) + this.name + this.childString(1);
+            out += this.childString(0) + ' ' + this.name + ' ' + this.childString(1);
         else if (this.type === NodeType.Function)
-            out += this.name + '(' + this.children[0] + ')';
+            out += this.name + '( ' + this.children[0] + ' )';
         else
             out += this.name;
 
@@ -341,11 +387,11 @@ export class Node {
     }
 
     /**
-     * Only for debugging. Returns the tree structure going through it using DFS.
+     * TODO: Only for debugging. Returns the tree structure going through it using DFS.
      * @param scope
      * @return {string}
      */
-    public detailedChildrenString (scope?: any): string {
+    public detailedChildrenString(scope?: any): string {
         let out = this.name + ': ' + NodeType[this.type] + ' --- Value: ' + this.getNumberValue(scope) + '\n';
 
         if (this.type === NodeType.BinaryOperator) {
@@ -360,29 +406,76 @@ export class Node {
         return out;
     }
 
+    /** Static methods */
+
     /**
-     * Prints a child according to this node operator's priority. The intention is that this.toString
-     * prints correctly the brackets needed.
-     * @param n
+     * Checks if a char is alpha.
+     * @param c The character to check.
+     * @return {boolean} Whether c is or is not alpha.
+     */
+    protected static isAlpha(c: string): boolean {
+        return c.length === 1 && c.search(/[a-z]|[A-Z]/i) >= 0;
+    }
+
+    /**
+     * Checks if a char is numeric.
+     * @param c The character to check.
+     * @return {boolean} Whether c is or is not a number.
+     */
+    protected static isNumeric(c: string): boolean {
+        return c.length === 1 && c.search(/[0-9]/i) >= 0;
+    }
+
+    /**
+     * Checks if a char is alphanumeric.
+     * @param c The character to check.
+     * @return {boolean} Whether c is or is not alpha or a number.
+     */
+    protected static isAlphaNumeric(c: string): boolean {
+        return c.length === 1 && c.search(/\w/i) >= 0;
+    }
+
+    /**
+     * Transforms the input string into a string readable for this and checks possible errors on input.
+     * Notes:
+     *  It is recommended to avoid ambiguity.
+     * @param s
      * @return {string}
      */
-    private childString(n: number): string {
-        let child = this.children[n];
-        let thisP = Node.scope.operators[this.name].priority;
-        let childP = Node.scope.operators[child.name] !== undefined ? Node.scope.operators[child.name].priority : Infinity;
+    protected static formatString(s: string): string {
+        // This two turns expressions like: ( exp ), ( exp), (exp ) into (exp).
+        s = s.replace(/\( */g, '(');
+        s = s.replace(/ *\)/g, ')');
+        s = s.replace(/ *\+ */g, '+');
+        s = s.replace(/ *\* */g, '*');
+        s = s.replace(/ *- */g, '-');
+        s = s.replace(/ *\/ */g, '/');
+        s = s.replace(/ *\^ */g, '^');
+        s = s.replace(/ +/g, '*');
+        s = s.replace(/--/g, '');
 
-        if (childP !== undefined && thisP > childP)
-            return '(' + child.toString() + ')';
-        return child.toString();
+        if (s[0] === '-')
+            s = '0' + s;
+        // Checks if there are empty expressions on input
+        if (s.length === 0 || s.search(/\( *\)/) >= 0)
+            throw new InputError('There cannot be empty expressions on input.');
+        // Checks there are no errors on input
+        if (s.search(/(([*+\/^-])([*+\/^])+)|(\(([*+\/^])+)|(([*+\/^-])+\))/) >= 0)
+            throw new Error('There are two operators that does not suppose to be together: ' + s + '.');
+
+        return s;
     }
 
     /**
      * Sets a new variable to be used in expressions.
      * @param c The new constant.
      * @param v Its value.
+     * @param rational Whether its irrational or not
      */
-    public static setConstant(c: string, v: number): void {
+    public static setConstant(c: string, v: number, rational: boolean = true): void {
         Node.scope.constants[c] = v;
+        if (rational)
+            Node.scope.irrationals[c] = true;
     }
 
     /**
@@ -397,33 +490,22 @@ export class Node {
     }
 
     /**
-     * Checks if a char is alpha.
-     * @param c The character to check.
-     * @return {boolean} Whether c is or is not alpha.
+     * Returns a new node built from s.
+     * @param s The expression or node from where to build the new node.
+     * @return {Node} The node created.
      */
-    private static isAlpha(c: string) {
-        return c.length === 1 && c.search(/[a-z]|[A-Z]/i) >= 0;
-    }
-
-    /**
-     * Checks if a char is numeric.
-     * @param c The character to check.
-     * @return {boolean} Whether c is or is not a number.
-     */
-    private static isNumeric(c: string) {
-        return c.length === 1 && c.search(/[0-9]/i) >= 0;
-    }
-
-    /**
-     * Checks if a char is alphanumeric.
-     * @param c The character to check.
-     * @return {boolean} Whether c is or is not alpha or a number.
-     */
-    private static isAlphaNumeric(c: string) {
-        return c.length === 1 && c.search(/\w/i) >= 0;
+    public static newNode(s: string | Node): Node {
+        return new Node(s);
     }
 }
 
+/**
+ * Nodes might be (key: NodeType):
+ * 0. Function.
+ * 1. BinaryOperator.
+ * 2. Constant.
+ * 3. Symbol.
+ */
 export enum NodeType {
     Function,
     BinaryOperator,

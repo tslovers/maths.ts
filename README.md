@@ -40,4 +40,7 @@ We are working on a website to upload several examples but at this time we only 
     a = math.eval('2*3'); // maths.ts obj {6}
     a.multiply(4); // maths.ts obj {24}
     
+Please use brackets to avoid ambiguities like 2^3^4. 2^3^4 may be
+interpreted as 2^(3^4) as well as (2^3)^4, throwing two different results.
+    
 ## Documentation

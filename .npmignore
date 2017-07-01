@@ -1,0 +1,9 @@
+maths.ts.iml
+tsconfig.json
+webpack.config.js
+CHANGELOG.md
+.idea/
+# include or not include?
+bundle/
+# include or not include?
+src/

@@ -44,3 +44,23 @@ Please use brackets to avoid ambiguities like 2^3^4. 2^3^4 may be
 interpreted as 2^(3^4) as well as (2^3)^4, throwing two different results.
     
 ## Documentation
+
+## Contributing
+Please feel welcome to contribute with any improvement, correction, opinion, comment,
+etc. Your contribution is important, software would not be what it is now without
+the large community it has behind, so, help us reporting bugs, recommending this
+library, suggest improvements or even new features.
+
+Some considerations you need to take before contributing:
+- Coding properly is very important when developing software.
+Especially when you are working with open source. Maths.ts follow this unofficial
+[Coding Guideline](https://github.com/IpiVasquez/maths.ts/blob/master/coding-guideline.md) proposed by [@basarat](https://github.com/basarat).
+- Make sure you properly unit test your changes.
+- In case you suggested a new feature, create the unit the respective
+unit test too.
+- Make sure you are working on dev branch, this branch will have the
+most recent changes on repository.
+- Only commit changes on ./src/ and ./test/.
+- Email me for comments, opinions, suggestions, questions, etc.
+
+* * *

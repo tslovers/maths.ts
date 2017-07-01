@@ -1,6 +1,7 @@
 # maths.ts
 [![Version](https://img.shields.io/npm/v/maths.ts.svg)](https://www.npmjs.com/package/maths.ts)
 [![Downloads](https://img.shields.io/npm/dm/maths.ts.svg)](https://www.npmjs.com/package/maths.ts)
+[![Build Status](https://img.shields.io/travis/IpiVasquez/maths.ts.svg)](https://travis-ci.org/IpiVasquez/maths.ts)
 ![Maintenance](https://img.shields.io/maintenance/yes/2017.svg)
 [![License](https://img.shields.io/github/license/IpiVasquez/maths.ts.svg)](https://github.com/IpiVasquez/maths.ts/blob/master/LICENSE)
 

@@ -15,8 +15,9 @@ body {
     align-content: center;
 }
 
-.sets form {
-    height: 400px;
+li p {
+    padding-left: 1em;
+    margin: 0;
 }
 
 .sets button {

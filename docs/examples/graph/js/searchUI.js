@@ -23,13 +23,16 @@ const states = [
 
 var state;
 var ctx;
+var $stateButtons;
 
 $(document).ready(function () {
     state = 0;
     var $clearButton = $('#clear').on('click', clearGraph);
-    var $addButton = $('#addPolygon').on('click', addPolygon);
-    var $stateButtons = $('button.state-button');
-    var $canvas = $('<canvas>').appendTo('#canvas-container');
+    var $addButton = $('#addPolygon').on('click', addPolygon)
+    $stateButtons = $('button.state-button');
+    var $canvas = $('<canvas>').appendTo('#canvas-container').on('mousemove', function (e) {
+        $('#position').html('(' + e.offsetX + ', ' + e.offsetY + ')');
+    });
     ctx = $canvas[0].getContext('2d');
     ctx.canvas.width = $canvas.parent().innerWidth();
     ctx.canvas.height = $canvas.parent().innerHeight();

@@ -30,12 +30,12 @@
                 <button class="state-button mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                     <select class="mdl-textfield__input" id="search" name="search">
-                        <option value="bfs">Breadth first search</option>
-                        <option value="dfs">Deep first search</option>
-                        <option value="idfs">Iterative DFS</option>
-                        <option value="ucs">Uniform cost search</option>
-                        <option value="greedy">Greedy search</option>
                         <option value="aStar">A* search</option>
+                        <option value="greedy">Greedy search</option>
+                        <option value="ucs">Uniform cost search</option>
+                        <option value="idfs">Iterative DFS</option>
+                        <option value="dfs">Deep first search</option>
+                        <option value="bfs">Breadth first search</option>
                     </select>
                     <label class="mdl-textfield__label" for="search">Search algorithm</label>
                 </div>
@@ -47,16 +47,10 @@
                         class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
                     Clear
                 </button>
-                <div class="instructions">
-                    <label for="f1-instructions">Click me to see instructions</label>
-                    <ol id="f1-instructions" style="display: none">
-                        <li>
-                            LoL<!-- TODO -->
-                        </li>
-                    </ol>
-                </div>
             </form>
         </div>
+        <p>Mouse canvas position: <span id="position"></span></p>
+        <ol id="logger"></ol>
     </div>
     <div id="canvas-container" style="border: solid 1px black; background: white; height: 700px"
          class="mdl-cell mdl-cell--8-col"></div>

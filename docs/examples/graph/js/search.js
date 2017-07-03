@@ -17,46 +17,55 @@ var graph;
  */
 function solve() {
     var algorithm = $('#search').val();
-    // console.log(algorithm);
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     for (var i = 0; i < polygons.length; i++)
         drawPolygon(polygons[i]);
     defineGraph();
     var log = [];
-    console.log(algorithm);
-    switch (algorithm) {
-        case 'ucs':
-            mathsts.graphs.ucs(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
-            break;
-        case 'aStar':
-            console.log('a');
-            mathsts.graphs.aStar(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
-            break;
-        case 'bfs':
-            mathsts.graphs.bfs(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
-            break;
-        case 'dfs':
-            mathsts.graphs.dfs(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
-            break;
-        case 'greedy':
-            mathsts.graphs.greedySearch(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
-            break;
-        case 'idfs':
-            mathsts.graphs.idfs(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
-            break;
-    }
-    // console.log(log);
-    var sol = log[log.length - 1];
-    // console.log('Sol?');
-    ctx.beginPath();
-    ctx.moveTo(start.x, start.y);
-    ctx.strokeStyle = COLORS.solution;
-    for (var j = 1; j < sol.stepInfo.trail.length; j++) {
-        var v = getVertex(sol.stepInfo.trail[j]);
-        ctx.lineTo(v.x, v.y);
-    }
-    ctx.stroke();
+    if (algorithm === 'ucs')
+        mathsts.graphs.ucs(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
+    else if (algorithm === 'aStar')
+        mathsts.graphs.aStar(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
+    else if (algorithm === 'bfs')
+        mathsts.graphs.bfs(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
+    else if (algorithm === 'dfs')
+        mathsts.graphs.dfs(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
+    else if (algorithm === 'greedy')
+        mathsts.graphs.greedySearch(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
+    else
+        mathsts.graphs.idfs(graph, getVertexNumber(polygons.length - 2, 0), getVertexNumber(polygons.length - 1, 0), log);
 
+    var sol = log[log.length - 1];
+    if ('Solution' === sol.stepName) {
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.strokeStyle = COLORS.solution;
+        for (var j = 1; j < sol.stepInfo.trail.length; j++) {
+            var v = getVertex(sol.stepInfo.trail[j]);
+            ctx.lineTo(v.x, v.y);
+        }
+        ctx.stroke();
+    }
+    var $logger = $('#logger');
+    for (var i = 0; i < log.length; i++) {
+        if (log[i].stepInfo.idVertexList) {
+            var v = getVertex(log[i].stepInfo.idVertexList[0].id);
+            var $li = $('<li>', {
+                html: '[(' + v.x + ', ' + v.y + '): ' + log[i].stepInfo.idVertexList[0].cost.toFixed(2) + ']<br>'
+            }).on('click', function () {
+                var dis = $(this).find('p').css('display');
+                $(this).find('p').css('display', dis === 'none' ? 'block' : 'none');
+            });
+            for (var j = 1; j < log[i].stepInfo.idVertexList.length; j++) {
+                v = getVertex(log[i].stepInfo.idVertexList[j].id);
+                $li.append($('<p>', {
+                    html: '[(' + v.x + ', ' + v.y + '): ' + log[i].stepInfo.idVertexList[j].cost.toFixed(2) + ']'
+                }).css('display', 'none'));
+            }
+            $logger.append($li);
+        }
+    }
+    $stateButtons.first().click();
 }
 
 /**
@@ -85,11 +94,11 @@ function defineGraph() {
     graph.setHeuristic(distance);
     polygons.forEach(function (p) {
         p.forEach(function (v) {
-            graph.addVertex('v' + i + '-' + j, v);
+            graph.addVertex('(' + v.x + ', ' + v.y + ')', v);
         });
     });
-    graph.addVertex('vs', start);
-    graph.addVertex('vf', finish);
+    graph.addVertex('(' + start.x + ', ' + start.y + ')', start);
+    graph.addVertex('(' + finish.x + ', ' + finish.y + ')', finish);
     everyLine = [];
     for (i = 0; i < polygons.length; i++)
         for (j = 0; j < polygons[i].length; j++)
@@ -229,6 +238,8 @@ function drawPolygon(dots) {
  * Clears all information in the program so a new model may be added.
  */
 function clearGraph() {
+    while (state > 0)
+        $stateButtons.first().click();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     graph = undefined;
     polygons = [];

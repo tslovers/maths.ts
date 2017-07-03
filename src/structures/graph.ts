@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-export type weightFunc = () => number;
+export type weightFunc = (s: Vertex, d: Vertex) => number;
 
 /**
  * Represents an edge of a graphs. It must provides a source, a destination and optionally a _weight and info.
@@ -63,7 +63,7 @@ export class Edge {
 
     get weight(): number {
         if (this.weightFunction)
-            return this.weightFunction();
+            return this.weightFunction(this.source, this.destination);
         else if (this._weight === undefined)
             return 1;
         else

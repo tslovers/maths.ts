@@ -1,0 +1,29 @@
+body {
+    background: #eee;
+    font-family: Roboto, sans-serif;
+}
+
+#layout {
+    width: 100%;
+    margin: 30px auto;
+    max-width: 1000px;
+    background: white;
+}
+
+.sets {
+    margin: 10px;
+    align-content: center;
+}
+
+.sets form {
+    height: 400px;
+}
+
+.sets button {
+    width: 49%;
+    margin-bottom: 20px;
+}
+
+.instructions label {
+    text-decoration: underline;
+}

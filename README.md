@@ -47,7 +47,7 @@ These lines will create a file on maths.ts/bundle/ which will contain maths.js a
 * [Wiki](https://github.com/IpiVasquez/maths.ts/wiki)
 
 ## Contributing
-There are many ways to [contribute](https://github.com/IpiVasquez/maths/.tsblob/master/CONTRIBUTING.md) to maths.ts.
+There are many ways to [contribute](https://github.com/IpiVasquez/maths.ts/blob/master/CONTRIBUTING.md) to maths.ts.
 
 * Submit bugs and help us verify fixes as they are checked in.
 * Review source code changes.
@@ -55,6 +55,6 @@ There are many ways to [contribute](https://github.com/IpiVasquez/maths/.tsblob/
 * Recommend this library.
 * Contribute bugs fixes.
 
-This project has adopted the [Contributor Covenant Code of Conduct](https://github.com/IpiVasquez/maths.ts/.tsblob/master/CODE_OF_CONDUCT).
+This project has adopted the [Contributor Covenant Code of Conduct](https://github.com/IpiVasquez/maths.ts/blob/master/CODE_OF_CONDUCT.md).
 
 * * *

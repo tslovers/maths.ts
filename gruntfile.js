@@ -9,13 +9,14 @@ module.exports = function (grunt) {
             lib: {
                 files: [{
                     src: ["./src/\*\*/\*.ts"],
-                    dest: tsconfig.outDir
+                    dest: tsconfig.compilerOptions.outDir
                 }],
                 options: {
                     target: tsconfig.compilerOptions.target,
                     sourceMap: tsconfig.compilerOptions.sourceMap,
                     declaration: tsconfig.compilerOptions.declaration,
-                    rootDir: tsconfig.rootDir
+                    rootDir: './src/',
+                    removeComments: false
                 }
             }
         },

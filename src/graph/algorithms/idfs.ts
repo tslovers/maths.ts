@@ -1,7 +1,7 @@
 /**
- * @licence
- * Copyright (C) 2017 Hector J. Vasquez <ipi.vasquez@gmail.com>
+ * @author Hector J. Vasquez <ipi.vasquez@gmail.com>
  *
+ * @licence
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import {Graph} from '../../structures/graph';
-import {Logger} from '../index';
+import {Graph} from '../Graph';
+import {Logger} from '../../algorithms/index';
 import {graphSearch, VertexElement} from "./graphSearch";
 
 const MAX_ITERATION_LIMIT = 100;
@@ -24,12 +24,12 @@ const MAX_ITERATION_LIMIT = 100;
 let i: number;
 
 /**
- * A modification of deep first search implementation called iterative deep first search.
- * @param graph A Graph object representing the graphs to go through.
- * @param source The starting vertex.
- * @param destination The desired vertex.
- * @param log Logs information about bfs execution.
- * @return {boolean} Whether the vertex is reachable from source graphs or not.
+ * A implementation of iterative deep first search algorithm.
+ * @param graph A Graph object representing the graph to go through.
+ * @param source The id of the source vertex.
+ * @param destination The id of the destination vertex.
+ * @param log Logs information about the algorithm execution.
+ * @return {boolean} True if the vertex is reachable from source graph or not.
  */
 export function idfs(graph: Graph, source: number, destination: number, log?: Logger): boolean {
     let found: boolean;

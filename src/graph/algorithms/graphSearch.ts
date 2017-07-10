@@ -1,7 +1,7 @@
 /**
- * @licence
- * Copyright (C) 2017 Hector J. Vasquez <ipi.vasquez@gmail.com>
+ * @author Hector J. Vasquez <ipi.vasquez@gmail.com>
  *
+ * @licence
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-import {Graph, Vertex} from "../../structures/graph";
-import {Logger} from "../index";
+import {Graph} from "../Graph";
+import {Vertex} from "../Vertex";
+import {Logger} from "../../algorithms/index";
 
 /**
  * An helping Interface for handling the vertex in list. It helps to store information about the vertexes and
- * the path followed to get there.
+ * the path followed to get there as well as the cost and depth for each vertex on list.
  */
 export interface VertexElement {
     id: number;
@@ -31,16 +32,19 @@ export interface VertexElement {
 }
 
 /**
- * Is a generic implementations for transversing graphs searching for an element.
- * BFS, DFS, Uniform cost search, A* are implemented on this function by sending their respective in and out functions
- * for each implementation. E.g. BFS sends Array.shift as next function and DFS send Array.pop instead.
- * @param graph The graphs to be transversed.
+ * A generic implementation for transversing graph searching for an element. This algorithm holds a list, defined
+ * by the interface VertexList. To be able to execute graphSearch, an outFunction and an inFunction must be provided.
+ * This functions will determine the list behavior.
+ *
+ * BFS, DFS, Uniform cost search and A* are implemented on this function by sending their respective in and out
+ * functions for each implementation. e.g. BFS sends Array.shift as next function and DFS send Array.pop instead.
+ * @param graph The graph to be transversed.
  * @param source The starting vertex.
  * @param destination The goal vertex.
  * @param outFunction The out function.
  * @param inFunction The in function.
  * @param logger An optional logger to knowing more about the algorithm.
- * @return {boolean} Whether destination is reachable from source.
+ * @return {boolean} True if destination is reachable from source, false if it does not.
  */
 export function graphSearch(graph: Graph, source: number, destination: number, outFunction: () => VertexElement,
                             inFunction: (i: VertexElement) => any, logger?: Logger): boolean {
@@ -59,13 +63,13 @@ export function graphSearch(graph: Graph, source: number, destination: number, o
     };
 
     if (logger)
-        return lgs(list, destination, logger);
+        return lgs(list, destination, logger); // Document every step in logger, hence documents the solution path.
     else
         return gs(list, destination);
 }
 
 /**
- * Holds the list of vertex. Moreover, it holds functions to push and get next vertex from this (push & next).
+ * Represents the list of vertexes. Moreover, it has functions to push and get next vertex from this (push & next).
  * Push & next are implemented by their respective algorithms; e.g. bfs sends Array.shift as next function.
  */
 interface VertexList {
@@ -76,7 +80,7 @@ interface VertexList {
 }
 
 /**
- * Just for knowing the status of each vertex. It is handled internally by VertexElement and graphSearch.
+ * Represents the status of each vertex. It is handled internally by VertexElement and graphSearch.
  */
 enum VertexStatus {
     NOT_VISITED,
@@ -85,10 +89,10 @@ enum VertexStatus {
 }
 
 /**
- * It just transverses the graphs looking for destination.
+ * Transverses the graph looking for destination.
  * @param list A initial list of vertexes to look for.
  * @param destination The goal of gs.
- * @return {boolean} Whether destination is reachable from an element on list.
+ * @return {boolean} True if destination is reachable from an element on list, else returns false.
  */
 function gs(list: VertexList, destination: number): boolean {
     // Until there is no more elements on list.
@@ -99,7 +103,7 @@ function gs(list: VertexList, destination: number): boolean {
         if (v.id === destination)
             return true;
 
-        v.vertex.edges.forEach((e) => { // Add all vertex on neighborhood if required
+        v.vertex.edges.forEach(e => { // Add all vertex on neighborhood if required
             if (list.status[e.destination.id] === VertexStatus.NOT_VISITED) {
                 list.status[e.destination.id] = VertexStatus.IN_QUEUE; // Update status
 
@@ -118,7 +122,7 @@ function gs(list: VertexList, destination: number): boolean {
 }
 
 /**
- * It just transverses the graphs looking for destination, besides, it informs about every step and the final path
+ * Transverses the graph looking for destination, besides, it informs about every step and the final path
  * to get to destination (if there is a solution).
  * @param list A initial list of vertexes to look for.
  * @param destination The goal of gs.
@@ -156,12 +160,13 @@ function lgs(list: VertexList, destination: number, logger: Logger): boolean {
             return true;
         }
 
-        v.vertex.edges.forEach((e) => { // Add all vertex on neighborhood if required
+        v.vertex.edges.forEach(e => {
+            // Add all vertex on neighborhood if they have not been visited
             if (list.status[e.destination.id] !== VertexStatus.VISITED) {
                 list.status[e.destination.id] = VertexStatus.IN_QUEUE; // Update status
                 logger[logger.length - 1].stepInfo.addedVertexes.push(e.destination.id);
 
-                let trail = v.trail.map((i) => i); // Copy trail
+                let trail = v.trail.map(i => i); // Copy trail
                 trail.push(e.destination.id); // Add this as new element on trail
 
                 list.push({
@@ -187,10 +192,10 @@ function lgs(list: VertexList, destination: number, logger: Logger): boolean {
  * @return Information about the current state of the list.
  */
 function getInfo(list: VertexList): any {
-    return list.vertexes.map((i) => {
+    return list.vertexes.map(i => {
         return {
             id: i.id,
-            trail: i.trail.map((i) => i),
+            trail: i.trail.map(i => i), // Copying it
             cost: i.cost,
             depth: i.depth
         }

@@ -1,7 +1,7 @@
 /**
- * @licence
- * Copyright (C) 2017 Hector J. Vasquez <ipi.vasquez@gmail.com>
+ * @author Hector J. Vasquez <ipi.vasquez@gmail.com>
  *
+ * @licence
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {BitSet} from '../structures';
+import {BitSet} from '../structures/index';
 
 /**
  * Default sieve's max prime number.

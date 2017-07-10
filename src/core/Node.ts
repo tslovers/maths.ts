@@ -1,7 +1,7 @@
 /**
- * @licence
- * Copyright (C) 2017 Hector J. Vasquez <ipi.vasquez@gmail.com>
+ * @author Hector J. Vasquez <ipi.vasquez@gmail.com>
  *
+ * @licence
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,9 +19,18 @@ import {InputError} from './Error';
 // import {getPrimeFactors} from '../utils';
 // import {getCommonDenominator} from "../utils/sieve";
 
+/**
+ * Inside the expressions, whenever numberPattern matches a string, it will be considered as a number.
+ */
 export const numberPattern = /((\d+)(\.\d+)?)|(\.\d+)/;
+/**
+ * Inside the expressions, whenever symbolPattern matches a string, it will be considered as a symbol.
+ */
 export const symbolPattern = /[a-z]\w*/i;
 
+/**
+ * Defines the operators available.
+ */
 let operators: any = {
     '+': {
         priority: 0,
@@ -93,6 +102,9 @@ let operators: any = {
     }
 };
 
+/**
+ * Defines the functions available.
+ */
 let functions: any = {
     sin: {
         fn: (node: Node, scope?: any) => {
@@ -152,6 +164,9 @@ let functions: any = {
     }
 };
 
+/**
+ * Defines the constants available.
+ */
 let constants: any = {
     e: Math.E,
     pi: Math.PI
@@ -170,8 +185,9 @@ constants.PI = constants.pi;
  *    a     -
  *         / \
  *        b   c
- *
- *  @class Node is going to be the basic tree node class. Any implementation of three must be extended with Node.
+ */
+/**
+ *  Node is going to be the basic tree node class. Any implementation of tree expressions must be extended with Node.
  *
  *  Notes: Still deciding if Node should be exported outside maths.ts or just used inside exporting only
  *  it's subclasses. Comments on this are welcome.
@@ -182,6 +198,10 @@ export class Node {
     public parent: Node;
     public type: NodeType;
 
+    /**
+     * Defines the scope for this expression, so, whenever this expression is evaluated it will check for the symbols
+     * in this scope and it will evaluated as is defined here.
+     */
     public static scope: any = {
         functions: functions,
         constants: constants,

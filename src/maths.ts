@@ -1,7 +1,7 @@
 /**
- * @licence
- * Copyright (C) 2017 Hector J. Vasquez <ipi.vasquez@gmail.com>
+ * @author Hector J. Vasquez <ipi.vasquez@gmail.com>
  *
+ * @licence
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,6 @@
  * limitations under the License.
  */
 
-export * from './core';
-export * from './structures';
-export * from './algorithms';
+export * from './core/index';
+export * from './structures/index';
+export * from './graph';

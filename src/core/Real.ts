@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-import {Node} from '../core/Node';
-import {InputError} from "../core/Error";
+import {Node, NodeType} from './Node';
+import {InputError} from "./Error";
 
 export class Real {
-    // TODO
     private number: Node;
 
     /**
@@ -43,12 +42,43 @@ export class Real {
      * factorizes each node and tries to simplify it.
      */
     public simplify(): void {
-        // TODO: Everything
+        this.number = Real.simplifyNode(this.number);
+    }
+
+    /**
+     * Simplifies a given node to get the most accurate representation with the fewest child nodes.
+     * @param number The node representing the number to simplify.
+     * @return {Node} The simplified node
+     */
+    private static simplifyNode(number: Node): Node {
+        if (number.type === NodeType.Function || number.type === NodeType.BinaryOperator)
+            for (let i = 0; i < number.children.length; i++)
+                number.children[i] = this.simplifyNode(number.children[i]); // Simplifies each children
+        else if (number.type === NodeType.Constant)
+            number = this.processConstant(number); // Process number as a constant
+
+        return number;
+    }
+
+    /**
+     * Transforms a number to an accurate representation. Floating point numbers are transformed into rational numbers.
+     * @param number The node representing the number to be processed.
+     * @return {Node} The node representing the number transformed into a rational representation of it.
+     */
+    private static processConstant(number: Node): Node {
+        if (typeof number.name !== 'number' || Math.floor(number.name) === number.name)
+            return number;
+
+        let n: string = '' + number.name;
+        let nDigits = n.length - 1;
+        let nIntDigits = (Math.round(number.name) + '').length;
+        let denominator = Math.pow(10, nDigits - nIntDigits);
+        return new Node(n.replace('.', '') + '/' + denominator);
     }
 
     /**
      * Returns this as a number.
-     * @return {number} this number value.
+     * @return This number value.
      */
     get numberValue(): number {
         return this.number.getNumberValue();
@@ -56,7 +86,7 @@ export class Real {
 
     /**
      * Return the representation of this as a string.
-     * @return {string} this as a string.
+     * @return This as a string.
      */
     public toString(): string {
         return this.number.toString();

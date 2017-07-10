@@ -6,10 +6,11 @@
   "types": "./lib/maths.d.ts",
   "scripts": {
     "test": "mocha -r ts-node/register test/*.ts test/**/*.ts",
-    "prepare": "grunt ts",
+    "prepare": "grunt",
     "build": "grunt ts; webpack --debug; webpack -p; minify bundle/ -c",
     "watch": "grunt watch",
-    "grunt": "grunt"
+    "grunt": "grunt",
+    "doc": "typedoc src/maths.ts --out docs/reference --module umd --exclude **/index.ts --excludePrivate"
   },
   "repository": {
     "type": "git",
@@ -32,18 +33,18 @@
   },
   "homepage": "https://github.com/IpiVasquez/maths.ts#readme",
   "devDependencies": {
-    "@types/chai": "^4.0.0",
-    "@types/mocha": "^2.2.41",
-    "chai": "^4.0.2",
-    "grunt": "^1.0.1",
-    "grunt-contrib-watch": "^1.0.0",
-    "grunt-exec": "^2.0.0",
-    "grunt-ts": "^6.0.0-beta.16",
-    "jsdoc": "^3.4.3",
-    "minifier": "^0.8.1",
-    "mocha": "^3.4.2",
-    "ts-node": "^3.0.6",
-    "typescript": "^2.3.4",
-    "webpack": "^3.0.0"
+    "@types/chai": "latest",
+    "@types/mocha": "latest",
+    "chai": "latest",
+    "grunt": "latest",
+    "grunt-contrib-watch": "latest",
+    "grunt-exec": "latest",
+    "grunt-ts": "latest",
+    "minifier": "latest",
+    "mocha": "latest",
+    "ts-node": "latest",
+    "typedoc": "^0.7.1",
+    "typescript": "latest",
+    "webpack": "latest"
   }
 }

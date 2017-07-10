@@ -1,7 +1,7 @@
 /**
- * @licence
- * Copyright (C) 2017 Hector J. Vasquez <ipi.vasquez@gmail.com>
+ * @author Hector J. Vasquez <ipi.vasquez@gmail.com>
  *
+ * @licence
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,9 +15,12 @@
  * limitations under the License.
  */
 
-export * from './bfs';
-export * from './dfs';
-export * from './idfs';
-export * from './ucs';
-export * from './aStar';
-export * from './greedy';
+// Structures
+export * from './Graph';
+export * from './Vertex';
+export * from './Edge';
+// Algorithms
+import * as algorithms from './algorithms/index';
+export {
+    algorithms
+}

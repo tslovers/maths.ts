@@ -15,20 +15,13 @@
  * limitations under the License.
  */
 
-/**
- * Exception thrown when the user sends a wrong input.
- */
-export class InputError extends Error {
-    constructor(message: string = 'There is something wrong with the input.') {
-        super(message);
-    }
-}
+// Search algorithms
+export * from './bfs';
+export * from './dfs';
+export * from './idfs';
+export * from './ucs';
+export * from './aStar';
+export * from './greedy';
+// TODO: Flow algorithms
 
-/**
- * Exception thrown when an object with the same key in certain scope is created at the same scope.
- */
-export class DuplicatedKeyError extends Error {
-    constructor(m: string = 'You are trying to add an already existing key.') {
-        super(m);
-    }
-}
+// TODO: Dijkstra, Ford-Ful...

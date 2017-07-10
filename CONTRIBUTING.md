@@ -26,7 +26,7 @@ Your pull request should:
 * Include a description of what your change intends to do.
 * In the case of a new feature, it is necessary create a new test.
 * Have clear commit messages
-* Follow the code conventions described in [Coding guidelines](https://github.com/IpiVasquez/maths.ts/blob/master/coding-guideline.md)
+* Follow the code conventions described in [Coding guidelines](https://github.com/IpiVasquez/maths.ts/blob/master/CODING_GUIDELINE.md)
 
 ## Running the tests
 To run all test, just run:

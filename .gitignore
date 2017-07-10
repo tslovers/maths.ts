@@ -9,3 +9,4 @@ node_modules/
 lib/
 # include or not include?
 bundle/
+package-lock.json

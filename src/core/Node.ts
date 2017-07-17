@@ -193,7 +193,7 @@ constants.PI = constants.pi;
  *  it's subclasses. Comments on this are welcome.
  */
 export class Node {
-    public children: Node[];
+    public children: Node[] = [];
     public name: string | number;
     public parent: Node;
     public type: NodeType;
@@ -231,8 +231,7 @@ export class Node {
             this.name = typeof s.name === 'number' ? s.name : s.name.toString();
             this.parent = s.parent;
             this.type = s.type;
-            if (s.children !== undefined)
-                this.children = s.children.map(Node.newNode);
+            this.children = s.children.map(Node.newNode);
         } else if (typeof s === 'string') // Is string then
             this.buildTree(this.separate(Node.formatString(s)));
         else if (s.length === 0) // Is an array with 0 elements, hence, invalid
@@ -264,7 +263,7 @@ export class Node {
      * @param children The array where to store the candidates.
      * @return {string[]} Candidate nodes.
      */
-    public separate(s: string, children: string[] = []): string[] {
+    private separate(s: string, children: string[] = []): string[] {
         let i = 0, j = s[0] === '(' ? 1 : 0;
 
         if (s.length === 0)
@@ -302,7 +301,7 @@ export class Node {
      * Builds a tree with this node as a root.
      * @param elements The elements obtained from separate.
      */
-    public buildTree(elements: string[]): void {
+    private buildTree(elements: string[]): void {
         if (elements.length === 0)
             throw new InputError('Node cannot be built because of wrong input: ' +
                 (this.parent ? this.parent.toString() : 'unknown') + '.');
@@ -383,6 +382,104 @@ export class Node {
         else if (this.type === NodeType.Symbol && scope !== undefined && scope[this.name] !== undefined)
             return scope[this.name];
         return undefined;
+    }
+
+    /**
+     * Simplifies this node by factorizing, eliminating common factors, multiplying constants.
+     * This.simplify uses DFS to simplify each node on this tree.
+     */
+    public simplify(): void {
+        for (let i = 0; i < this.children.length; i++)
+            this.children[i].simplify();
+
+        if (this.type === NodeType.Constant)
+            this.processConstant();
+        if (this.type === NodeType.BinaryOperator)
+            this.processOperator();
+        // TODO: Function simplifier: Logs, e, etc, etc.
+        // TODO: Extract factors and simplify using those factors
+        // TODO: In products the factors are supposed to merge, in addition the factors must be the same.
+        // It will be a very rudimentary work but it will do what it has to do.
+    }
+
+    private processOperator(): void {
+        switch (this.name) {
+            case '*':
+            case '/':
+                this.simplifyProduct();
+                break;
+            case '+':
+                break;
+            case '-':
+                break;
+            case '^':
+                break;
+            default:
+                throw new Error('Processing an unexpected operator.');
+        }
+    }
+
+    private simplifyProduct(): void {
+        if (this.name !== '*' && this.name !== '/')
+            throw new Error('Processing an unexpected operator.');
+
+        let numerator: Node[] = [];
+        let denominator: Node[] = [];
+        let queue: any[] = [];
+
+        queue.push({
+            origin: numerator,
+            noOrigin: denominator,
+            node: this.children[0]
+        });
+        queue.push({
+            origin: this.name === '*' ? numerator : denominator,
+            noOrigin: this.name === '/' ? numerator : denominator,
+            node: this.children[1]
+        });
+
+        while (queue.length) {
+            let node = queue.shift();
+            if (node.node.name === '*' || node.node.name === '/') {
+                queue.push({
+                    origin: node.origin,
+                    noOrigin: node.noOrigin,
+                    node: node.node.children[0]
+                });
+                queue.push({
+                    origin: node.node.name === '*' ? node.origin : node.noOrigin,
+                    noOrigin: node.node.name === '/' ? node.origin : node.noOrigin,
+                    node: node.node.children[1]
+                });
+            } else
+                node.origin.push(node.node);
+        }
+
+        console.log('Num: ', numerator.map(i => i.toString()));
+        console.log('Den: ', denominator.map(i => i.toString()));
+        // TODO: Common factors from all items in numerator and denominator
+    }
+
+    /**
+     * Transforms a number to an accurate representation. Floating point numbers
+     * are transformed into rational numbers.
+     */
+    private processConstant(): void {
+        // It is not a fraction
+        if (typeof this.name !== 'number' || Math.floor(this.name) === this.name)
+            return;
+
+        let n: string = '' + this.name;
+        let nDigits = n.length - 1;
+        let nIntDigits = (Math.round(this.name) + '').length;
+        let denominator = Math.pow(10, nDigits - nIntDigits);
+        // Build this as a fraction
+        this.type = NodeType.BinaryOperator;
+        this.name = '/';
+        this.children = [
+            new Node(n.replace('.', '')),
+            new Node(denominator)
+        ];
     }
 
     /**

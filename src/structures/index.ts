@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-import * as core from './core';
-import * as util from './utils';
-import * as structures from './structures';
-import * as arithmetic from './arithmetic';
+import BitSet from './BitSet';
+import Graph from './Graph';
+import Vertex from './Vertex';
+import Edge from './Edge';
 
 export {
-    arithmetic,
-    core,
-    structures,
-    util
+    BitSet,
+    Edge,
+    Graph,
+    Vertex
 };

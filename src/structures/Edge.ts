@@ -14,14 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Vertex} from './Vertex';
+
+import Vertex from './Vertex';
 import {weightFunc} from './Graph';
 
 
 /**
- * Represents an edge of a graph. It must provides a source, a destination and optionally a weight and info.
+ * Represents an edge of a graph. It must provides a source, a destination
+ * and optionally a weight and info.
  */
-export class Edge {
+export default class Edge {
     private _source: Vertex;
     private _destination: Vertex;
     private _weight: number;
@@ -29,13 +31,16 @@ export class Edge {
     public info: any;
 
     /**
-     * Builds this with respective source, destination, weight(optional) and info(optional).
+     * Builds this with respective source, destination, weight(optional) and
+     * info(optional).
      * @param source The source of this.
      * @param destination The destination of this.
-     * @param weight The weight for this. It may be the result of a function or just a number.
+     * @param weight The weight for this. It may be the result of a function
+     * or just a number.
      * @param info Additional info for this.
      */
-    constructor(source: Vertex, destination: Vertex, weight?: number | weightFunc, info?: any) {
+    constructor(source: Vertex, destination: Vertex,
+                weight?: number | weightFunc, info?: any) {
         this.source = source;
         this.destination = destination;
         if (typeof weight === 'number')
@@ -55,7 +60,7 @@ export class Edge {
 
     /**
      * Sets the origin point for this.
-     * @param value
+     * @param value The vertex wanted to be the source of this edge.
      */
     set source(value: Vertex) {
         this._source = value;
@@ -78,9 +83,10 @@ export class Edge {
     }
 
     /**
-     * Returns the weight of this edge. If weight is given by a function it executes such function. If there is no
-     * weight defined it returns 1. If the weight is given by a number it just returns the number.
-     * @return {number}
+     * Returns the weight of this edge. If weight is given by a function it
+     * executes such function. If there is no weight defined it returns 1.
+     * If the weight is given by a number it just returns the number.
+     * @return The weight associated to this edge.
      */
     get weight(): number {
         if (this.weightFunction)
@@ -101,7 +107,8 @@ export class Edge {
 
     /**
      * Sets a weight function for this vertex.
-     * @param f A function receiving the two vertex adjacent to this to calculate weight for this.
+     * @param f A function receiving the two vertex adjacent to this to
+     * calculate weight for this.
      */
     public setWeightFunction(f: weightFunc) {
         this.weightFunction = f;
@@ -116,7 +123,7 @@ export class Edge {
 
     /**
      * Returns this as an coordinate: (source, destiny, weight).
-     * @return {string} The representation of this.
+     * @return The representation of this.
      */
     public toString() {
         return '(' + this.source.name + ', ' + this.destination.name +

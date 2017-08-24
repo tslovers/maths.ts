@@ -15,4 +15,27 @@
  * limitations under the License.
  */
 
-export * from './sieve';
+export * from './Logger';
+
+/**
+ * Gets a random natural number given a range.
+ * @param lowerBound The lowest number possible.
+ * @param upperBound The greatest number possible.
+ * @return A random natural number in [lowerBound, upperBound) range.
+ */
+export function getRandomNatural(lowerBound: number,
+                                 upperBound: number): number {
+    return Math.floor(getRandomNumber(lowerBound, upperBound));
+}
+
+/**
+ * Gets a random real number given a range.
+ * @param lowerBound The lowest number possible.
+ * @param upperBound The greatest number possible.
+ * @return A random real number in [lowerBound, upperBound) range.
+ */
+export function getRandomNumber(lowerBound: number,
+                                upperBound: number): number {
+    return Math.floor(Math.random() * (upperBound - lowerBound + 1))
+        + lowerBound;
+}

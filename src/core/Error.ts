@@ -15,14 +15,18 @@
  * limitations under the License.
  */
 
-import * as core from './core';
-import * as util from './utils';
-import * as structures from './structures';
-import * as arithmetic from './arithmetic';
+export interface InputErrorInfo {
+    input: string;
+    message: string;
+}
 
-export {
-    arithmetic,
-    core,
-    structures,
-    util
-};
+export class InputError extends Error {
+    private input: string;
+
+    constructor(error: string | InputErrorInfo) {
+        if (typeof error === 'string')
+            super(error);
+        else
+            super(error.message + ' -- at: ' + error.input);
+    }
+}

@@ -15,4 +15,9 @@
  * limitations under the License.
  */
 
-export {}
+import sieveOfEratosthenes from './sieve';
+
+export {
+    sieveOfEratosthenes
+};
+export * from './fundamental';

@@ -15,14 +15,10 @@
  * limitations under the License.
  */
 
-import * as core from './core';
-import * as util from './utils';
-import * as structures from './structures';
-import * as arithmetic from './arithmetic';
-
-export {
-    arithmetic,
-    core,
-    structures,
-    util
-};
+/**
+ * The formal definition of the algorithms logger.
+ */
+export type Logger = {
+    stepName: string;
+    stepInfo?: any;
+}[];

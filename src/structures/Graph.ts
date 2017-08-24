@@ -13,27 +13,28 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @module graph
  */
 
-import {Edge} from './Edge';
-import {Vertex} from './Vertex';
+import Edge from './Edge';
+import Vertex from './Vertex';
 
 export type weightFunc = (s: Vertex, d: Vertex) => number;
 
 /**
- * Represents a graph as an adjacency list. It provides methods for adding/removing vertex and edges.
+ * Represents a graph as an adjacency list. It provides methods for
+ * adding/removing vertex and edges.
  */
-export class Graph {
+export default class Graph {
     private _vertexes: Vertex[];
     private _heuristic: (s: Vertex, d: Vertex) => number;
     private directed: boolean;
 
     /**
-     * Builds a graph with or without vertex. // TODO: neighbor and graph function generators.
+     * Builds a graph with or without vertex.
+     * TODO: neighbor and graph function generators.
      * @param nVertexes The initial number of vertexes for this.
-     * @param directed Indicates if the graph is going to be a directed graph or not.
+     * @param directed Indicates if the graph is going to be a directed
+     * graph or not.
      */
     constructor(nVertexes?: number, directed: boolean = false) {
         // TODO: There may be a better way to built a graph, I think.
@@ -59,17 +60,24 @@ export class Graph {
      * @param weight
      * @param info
      */
-    public addEdge(from: number, to: number, weight?: number | weightFunc, info?: any) {
-        this.vertexes[from].addEdge(new Edge(this.vertexes[from], this.vertexes[to], weight, info));
+    public addEdge(from: number, to: number, weight?: number | weightFunc,
+                   info?: any) {
+        this.vertexes[from].addEdge(
+            new Edge(this.vertexes[from], this.vertexes[to], weight, info)
+        );
         if (!this.directed)
-            this.vertexes[to].addEdge(new Edge(this.vertexes[to], this.vertexes[from], weight, info));
+            this.vertexes[to].addEdge(
+                new Edge(this.vertexes[to], this.vertexes[from], weight, info)
+            );
     }
 
     /**
-     * Returns the value gotten from evaluating a given heuristic with given source and destination.
+     * Returns the value gotten from evaluating a given heuristic with given
+     * source and destination.
      * @param s The source.
      * @param d The destination.
-     * @return {number} The distance between them according to the heuristic defined on this graph.
+     * @return {number} The distance between them according to the heuristic
+     * defined on this graph.
      */
     public heuristicValue(s: number, d: number): number {
         if (this._heuristic)
@@ -87,7 +95,7 @@ export class Graph {
 
     /**
      * Gets the vertex in this graph.
-     * @return {Vertex[]}
+     * @return The vertexes of this graph.
      */
     get vertexes(): Vertex[] {
         return this._vertexes;
@@ -95,11 +103,13 @@ export class Graph {
 
     /**
      * Gets all edges from Graph.
-     * @return {Edge[]}
+     * @return The edges of this graph.
      */
     get edges(): Edge[] {
         let es: Edge[] = [];
-        this.vertexes.forEach((v) => v.edges.forEach((e) => es.push(e)));
+        this.vertexes.forEach(
+            (v) => v.edges.forEach((e) => es.push(e))
+        );
         return es;
     }
 

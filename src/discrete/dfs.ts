@@ -15,28 +15,29 @@
  * limitations under the License.
  */
 
-import {Graph} from '../Graph';
-import {Logger} from '../../algorithms/index';
-import {graphSearch, VertexElement} from "./graphSearch";
+import Graph from '../structures/Graph';
+import {Logger} from '../utils';
+import {graphSearch, VertexElement} from './graphSearch';
 
 /**
- * A implementation of breadth first search algorithm.
+ * A implementation of deep first search algorithm.
  * @param graph A Graph object representing the graph to go through.
  * @param source The id of the source vertex.
  * @param destination The id of the destination vertex.
  * @param log Logs information about the algorithm execution.
- * @return {boolean} True if the vertex is reachable from source graph or not.
+ * @return true if the vertex is reachable from source graph, false otherwise.
  */
-export function bfs(graph: Graph, source: number, destination: number, log?: Logger): boolean {
-    return graphSearch(graph, source, destination, shift, push, log);
+export function dfs(graph: Graph, source: number, destination: number,
+                    log?: Logger): boolean {
+    return graphSearch(graph, source, destination, pop, push, log);
 }
 
 /**
- * The extracting function for the list of Vertexes used for bfs.
- * @return {VertexElement} The next vertex to evaluate.
+ * The extracting function for the list of Vertexes used for dfs.
+ * @return The next vertex to evaluate.
  */
-function shift(): VertexElement {
-    return this.vertexes.shift();
+function pop(): VertexElement {
+    return this.vertexes.pop();
 }
 
 /**

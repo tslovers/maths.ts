@@ -1,6 +1,6 @@
 {
   "name": "maths.ts",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Math utilities library for TypeScript, JavaScript and Node.js",
   "main": "./lib/maths.js",
   "types": "./lib/maths.d.ts",

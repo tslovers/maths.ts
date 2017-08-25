@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-describe('maths.ts', () => {
-    it('It works!', () => {
-        // In this section you may put some test to the code for extra
-        // features you may be testing. This is for the annoyance of
-        // compile, go to node, run again your code, etc. Besides, npm test
-        // tells you which line collapse and this is a huge time saver for
-        // debugging new features.
-    });
-});
+/**
+ * Represents a coordinate. This will be used in plots, grids, matrix, etc.
+ */
+export interface Coordinate {
+    x: number;
+    y: number;
+}

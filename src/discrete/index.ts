@@ -15,12 +15,23 @@
  * limitations under the License.
  */
 
-describe('maths.ts', () => {
-    it('It works!', () => {
-        // In this section you may put some test to the code for extra
-        // features you may be testing. This is for the annoyance of
-        // compile, go to node, run again your code, etc. Besides, npm test
-        // tells you which line collapse and this is a huge time saver for
-        // debugging new features.
-    });
-});
+import Graph from '../structures/Graph';
+import Vertex from '../structures/Vertex';
+import Edge from '../structures/Edge';
+
+// Search algorithms
+export * from './bfs';
+export * from './dfs';
+export * from './idfs';
+export * from './ucs';
+export * from './aStar';
+export * from './greedy';
+
+export {
+    Graph,
+    Vertex,
+    Edge
+};
+// TODO: Flow algorithms
+
+// TODO: Dijkstra, Ford-Ful...

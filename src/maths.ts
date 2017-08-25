@@ -15,6 +15,19 @@
  * limitations under the License.
  */
 
-export * from './core/index';
-export * from './structures/index';
-export * from './graph';
+import * as util from './utils';
+import * as structures from './structures';
+import * as arithmetic from './arithmetic';
+import * as plotter from './plotter';
+import * as graph from './discrete';
+
+export {
+    arithmetic,
+    graph,
+    plotter,
+    structures,
+    util
+};
+
+export * from './algorithms';
+export * from './core';

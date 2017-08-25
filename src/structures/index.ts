@@ -13,10 +13,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @module structures
  */
 
-export * from '../graph/Graph';
-export * from './BitSet';
-export * from '../graph/Vertex';
+import BitSet from './BitSet';
+import Graph from './Graph';
+import Vertex from './Vertex';
+import Edge from './Edge';
+import Matrix from './Matrix';
+
+export {
+    BitSet,
+    Edge,
+    Graph,
+    Matrix,
+    Vertex
+};

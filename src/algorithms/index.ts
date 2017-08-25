@@ -13,14 +13,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @module algorithms
  */
 
+export * from './quickSort';
+export * from './mergeSort';
+
 /**
- * The formal definition of the algorithms logger.
+ * A log will be a register where to store information about some steps in
+ * algorithms execution. If there is the need to keep a record about the
+ * steps in some algorithms then Log may be used to store it.
  */
-export type Logger = {
-    stepName: string;
-    stepInfo?: any;
-}[];
+export interface Log {
+    name: string;
+    info?: any;
+    htmlRepresentation?: HTMLElement;
+    stringRepresentation?: string;
+    representation?: any;
+}
+
+export type Logger = Log[];

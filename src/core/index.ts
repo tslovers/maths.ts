@@ -15,5 +15,8 @@
  * limitations under the License.
  */
 
-export * from './Node'; // TODO: export or not to export
-export * from './Real';
+import Node from './Node';
+
+export {
+    Node as Expression
+};

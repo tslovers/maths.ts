@@ -15,20 +15,18 @@
  * limitations under the License.
  */
 
-/**
- * Exception thrown when the user sends a wrong input.
- */
-export class InputError extends Error {
-    constructor(message: string = 'There is something wrong with the input.') {
-        super(message);
-    }
+export interface InputErrorInfo {
+    input: string;
+    message: string;
 }
 
-/**
- * Exception thrown when an object with the same key in certain scope is created at the same scope.
- */
-export class DuplicatedKeyError extends Error {
-    constructor(m: string = 'You are trying to add an already existing key.') {
-        super(m);
+export class InputError extends Error {
+    private input: string;
+
+    constructor(error: string | InputErrorInfo) {
+        if (typeof error === 'string')
+            super(error);
+        else
+            super(error.message + ' -- at: ' + error.input);
     }
 }

@@ -21,30 +21,31 @@ import Node from '../../src/core/Node';
 describe('core::Node', () => {
     it('Build', () => {
         let n = new Node('1*-1.4/(3+(2))+(1+1)+(sin(pi))+1-1');
-        expect(1.72).to.equals(n.getNumberValue());
+        expect(1.72).to.equals(n.numberValue);
     });
 
     it('Addition', () => {
         let n = new Node(1);
-        n = n.add(2);
-        expect(n.getNumberValue()).to.equals(3);
+        n = n.add(-2);
+        expect(n.getNumberValue()).to.equals(-1);
+        expect(n.add(n.negate()).numberValue).to.equals(0);
     });
 
     it('Subtraction', () => {
         let n = new Node(1);
-        n = n.subtract(2);
-        expect(n.getNumberValue()).to.equals(-1);
+        n = n.subtract(-2);
+        expect(n.numberValue).to.equals(3);
     });
 
     it('Multiplication', () => {
         let n = new Node(1);
-        n = n.multiply(2);
-        expect(n.getNumberValue()).to.equals(2);
+        n = n.multiply(-2);
+        expect(n.numberValue).to.equals(-2);
     });
 
     it('Division', () => {
         let n = new Node(1);
-        n = n.divide(2);
-        expect(n.getNumberValue()).to.equals(0.5);
+        n = n.divide('-1/4');
+        expect(n.numberValue).to.equals(-4);
     });
 });

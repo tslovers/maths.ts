@@ -16,9 +16,9 @@
  */
 
 /**
- * The formal definition of the algorithms logger.
+ * Represents a coordinate. This will be used in plots, grids, matrix, etc.
  */
-export type Logger = {
-    stepName: string;
-    stepInfo?: any;
-}[];
+export interface Coordinate {
+    x: number;
+    y: number;
+}

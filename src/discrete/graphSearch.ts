@@ -17,7 +17,7 @@
 
 import Graph from '../structures/Graph';
 import Vertex from '../structures/Vertex';
-import {Logger} from '../utils';
+import {Logger} from '../algorithms';
 
 /**
  * An helping Interface for handling the vertex in list. It helps to store
@@ -105,7 +105,8 @@ function gs(list: VertexList, destination: number): boolean {
     // Until there is no more elements on list.
     while (list.vertexes.length) {
         let v = list.next();
-        list.status[v.id] = VertexStatus.VISITED; // Update status for this node
+        // Update status for this node
+        list.status[v.id] = VertexStatus.VISITED;
         // Wuu! Found!
         if (v.id === destination)
             return true;
@@ -120,8 +121,8 @@ function gs(list: VertexList, destination: number): boolean {
                     vertex: e.destination,
                     id: e.destination.id,
                     trail: null,
-                    cost: null,
-                    depth: null
+                    cost: v.cost + e.weight,
+                    depth: v.depth + 1
                 });
             }
         });
@@ -132,26 +133,26 @@ function gs(list: VertexList, destination: number): boolean {
 
 /**
  * Transverses the graph looking for destination, besides, it informs about
- * every step and the final path to get to destination (if there is a solution).
+ * every name and the final path to get to destination (if there is a solution).
  * @param list A initial list of vertexes to look for.
  * @param destination The goal of gs.
- * @param logger A logger about every step on the execution.
+ * @param logger A logger about every name on the execution.
  * @return true if the vertex is reachable from source graph, false otherwise.
  */
 function lgs(list: VertexList, destination: number, logger: Logger): boolean {
     logger.push({
-        stepName: 'Starting search of ' + destination + ' from ' +
+        name: 'Starting search of ' + destination + ' from ' +
         list.vertexes[0].vertex.id,
-        stepInfo: {idVertexList: getInfo(list)}
+        info: {idVertexList: getInfo(list)}
     });
     // Until there is no more elements on list.
     while (list.vertexes.length) {
         let v = list.next();
         list.status[v.id] = VertexStatus.VISITED; // Update status for this node
         logger.push({
-            stepName: 'Current node: ' + v.id + (v.id === destination ?
+            name: 'Current node: ' + v.id + (v.id === destination ?
                 ' -> its goal!' : ''),
-            stepInfo: {
+            info: {
                 addedVertexes: [],
                 ignoredVertexes: []
             }
@@ -159,10 +160,10 @@ function lgs(list: VertexList, destination: number, logger: Logger): boolean {
 
         // Wuu! Found!
         if (v.id === destination) {
-            logger[logger.length - 1].stepInfo.idVertexList = getInfo(list);
+            logger[logger.length - 1].info.idVertexList = getInfo(list);
             logger.push({
-                stepName: 'Solution',
-                stepInfo: {
+                name: 'Solution',
+                info: {
                     trail: v.trail,
                     cost: v.cost,
                     depth: v.depth
@@ -176,7 +177,7 @@ function lgs(list: VertexList, destination: number, logger: Logger): boolean {
             if (list.status[e.destination.id] !== VertexStatus.VISITED) {
                 // Update status
                 list.status[e.destination.id] = VertexStatus.IN_QUEUE;
-                logger[logger.length - 1].stepInfo
+                logger[logger.length - 1].info
                     .addedVertexes.push(e.destination.id);
 
                 // Copy trail
@@ -192,11 +193,11 @@ function lgs(list: VertexList, destination: number, logger: Logger): boolean {
                     depth: v.depth + 1
                 });
             } else
-                logger[logger.length - 1].stepInfo
+                logger[logger.length - 1].info
                     .ignoredVertexes.push(e.destination.id);
         });
 
-        logger[logger.length - 1].stepInfo.idVertexList = getInfo(list);
+        logger[logger.length - 1].info.idVertexList = getInfo(list);
     }
 
     return false;

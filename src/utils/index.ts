@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-export * from './Logger';
-
 /**
  * Gets a random natural number given a range.
  * @param lowerBound The lowest number possible.

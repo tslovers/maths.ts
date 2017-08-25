@@ -34,7 +34,7 @@
   "homepage": "https://github.com/IpiVasquez/maths.ts#readme",
   "devDependencies": {
     "@types/chai": "latest",
-    "@types/mocha": "latest",
+    "@types/mocha": "^2.2.42",
     "chai": "latest",
     "grunt": "latest",
     "grunt-contrib-watch": "latest",
@@ -43,8 +43,12 @@
     "minifier": "latest",
     "mocha": "latest",
     "ts-node": "latest",
-    "typedoc": "^0.7.1",
+    "typedoc": "^0.7.2",
     "typescript": "latest",
     "webpack": "latest"
+  },
+  "dependencies": {
+    "@types/jquery": "^3.2.12",
+    "jquery": "^3.2.1"
   }
 }

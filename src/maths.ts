@@ -15,14 +15,19 @@
  * limitations under the License.
  */
 
-import * as core from './core';
 import * as util from './utils';
 import * as structures from './structures';
 import * as arithmetic from './arithmetic';
+import * as plotter from './plotter';
+import * as graph from './discrete';
 
 export {
     arithmetic,
-    core,
+    graph,
+    plotter,
     structures,
     util
 };
+
+export * from './algorithms';
+export * from './core';

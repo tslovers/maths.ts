@@ -21,7 +21,7 @@ import {weightFunc} from './Graph';
 
 /**
  * Represents an edge of a graph. It must provides a source, a destination
- * and optionally a weight and info.
+ * and optionally a weight and name.
  */
 export default class Edge {
     private _source: Vertex;
@@ -32,12 +32,12 @@ export default class Edge {
 
     /**
      * Builds this with respective source, destination, weight(optional) and
-     * info(optional).
+     * name(optional).
      * @param source The source of this.
      * @param destination The destination of this.
      * @param weight The weight for this. It may be the result of a function
      * or just a number.
-     * @param info Additional info for this.
+     * @param info Additional name for this.
      */
     constructor(source: Vertex, destination: Vertex,
                 weight?: number | weightFunc, info?: any) {

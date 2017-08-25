@@ -16,7 +16,7 @@
  */
 
 import Graph from '../structures/Graph';
-import {Logger} from '../utils';
+import {Logger} from '../algorithms';
 import {graphSearch, VertexElement} from './graphSearch';
 
 const MAX_ITERATION_LIMIT = 100;
@@ -38,8 +38,8 @@ export function idfs(graph: Graph, source: number,
     for (i = 0; i < MAX_ITERATION_LIMIT && !found; i++) {
         if (log !== undefined)
             log.push({
-                stepName: 'Iterative DFS - Depth: ' + i,
-                stepInfo: {}
+                name: 'Iterative DFS - Depth: ' + i,
+                info: {}
             });
         found = graphSearch(graph, source, destination, pop, push, log);
     }

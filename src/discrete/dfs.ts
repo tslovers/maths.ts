@@ -16,7 +16,7 @@
  */
 
 import Graph from '../structures/Graph';
-import {Logger} from '../utils';
+import {Logger} from '../algorithms';
 import {graphSearch, VertexElement} from './graphSearch';
 
 /**

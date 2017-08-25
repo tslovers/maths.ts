@@ -17,7 +17,7 @@
 
 import {Graph, Vertex} from '../../src/structures';
 import {aStar, bfs, dfs, greedySearch, idfs, ucs} from '../../src/discrete';
-import {Logger} from '../../src/utils';
+import {Logger} from '../../src/algorithms';
 import {expect} from 'chai';
 
 let SLACK: number = 0.0001;
@@ -47,9 +47,9 @@ describe('graph::bfs', () => {
         let logger: any = [];
         expect(bfs(g, 0, 5)).to.equals(true);
         expect(bfs(g, 2, 5, logger)).to.equals(true);
-        expect(logger.pop().stepInfo.depth).to.equals(2);
+        expect(logger.pop().info.depth).to.equals(2);
         expect(bfs(g, 5, 8, logger)).to.equals(true);
-        expect(logger.pop().stepInfo.depth).to.equals(3);
+        expect(logger.pop().info.depth).to.equals(3);
     });
 
     it('Unreachable element', () => {
@@ -75,7 +75,7 @@ describe('graph::idfs', () => {
         let logger: Logger = [];
         expect(idfs(g, 0, 5, logger)).to.equals(true);
         expect(idfs(g, 0, 5)).to.equals(true);
-        expect(logger.pop().stepInfo.depth).to.equals(3);
+        expect(logger.pop().info.depth).to.equals(3);
     });
 
     it('Unreachable element', () => {
@@ -89,9 +89,9 @@ describe('graph::ucs', () => {
         let logger: Logger = [];
         expect(ucs(g, 0, 5)).to.equals(true);
         expect(ucs(g, 0, 5, logger)).to.equals(true);
-        expect(logger.pop().stepInfo.cost).to.equals(35);
+        expect(logger.pop().info.cost).to.equals(35);
         expect(ucs(g, 2, 8, logger)).to.equals(true);
-        expect(logger.pop().stepInfo.cost).to.equals(50);
+        expect(logger.pop().info.cost).to.equals(50);
     });
 
     it('Unreachable element', () => {
@@ -120,9 +120,9 @@ describe('graph::aStar', () => {
     it('Reachable element', () => {
         let logger: Logger = [];
         expect(aStar(g, 0, 5, logger)).to.equals(true);
-        expect(logger.pop().stepInfo.cost).to.equals(35);
+        expect(logger.pop().info.cost).to.equals(35);
         expect(aStar(g, 5, 0, logger)).to.equals(true);
-        expect(logger.pop().stepInfo.cost).to.equals(35);
+        expect(logger.pop().info.cost).to.equals(35);
         expect(aStar(g, 0, 5)).to.equals(true);
     });
 

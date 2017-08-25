@@ -15,23 +15,20 @@
  * limitations under the License.
  */
 
-import Graph from '../structures/Graph';
-import Vertex from '../structures/Vertex';
-import Edge from '../structures/Edge';
+export * from './quickSort';
+export * from './mergeSort';
 
-// Search algorithms
-export * from './bfs';
-export * from './dfs';
-export * from './idfs';
-export * from './ucs';
-export * from './aStar';
-export * from './greedy';
+/**
+ * A log will be a register where to store information about some steps in
+ * algorithms execution. If there is the need to keep a record about the
+ * steps in some algorithms then Log may be used to store it.
+ */
+export interface Log {
+    name: string;
+    info?: any;
+    htmlRepresentation?: HTMLElement;
+    stringRepresentation?: string;
+    representation?: any;
+}
 
-export {
-    Graph,
-    Vertex,
-    Edge
-};
-// TODO: Flow algorithms
-
-// TODO: Dijkstra, Ford-Ful...
+export type Logger = Log[];

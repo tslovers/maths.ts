@@ -15,4 +15,8 @@
  * limitations under the License.
  */
 
-export * from './Node';
+import Node from './Node';
+
+export {
+    Node as Expression
+};

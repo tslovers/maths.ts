@@ -30,10 +30,10 @@ export default class Vertex {
     public id: number;
     /**
      * Extra information needed for this vertex such as coordinates, status,
-     * etc. shall be included in here. The intention for info is to be used
+     * etc. shall be included in here. The intention for name is to be used
      * as for example, the weight function of an edge or a heuristic in the
      * graph.
-     * e.g. Having this.info allows to calculate that heuristic as the
+     * e.g. Having this.name allows to calculate that heuristic as the
      * euclidean distance if it has the coordinates for this vertex.
      */
     public info: any;

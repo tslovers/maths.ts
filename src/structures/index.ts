@@ -19,10 +19,12 @@ import BitSet from './BitSet';
 import Graph from './Graph';
 import Vertex from './Vertex';
 import Edge from './Edge';
+import Matrix from './Matrix';
 
 export {
     BitSet,
     Edge,
     Graph,
+    Matrix,
     Vertex
 };

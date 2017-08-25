@@ -47,7 +47,7 @@ export default class Graph {
     /**
      * Adds a vertex to this graph.
      * @param name The name for the new vertex.
-     * @param info Additional info about the vertex.
+     * @param info Additional name about the vertex.
      */
     public addVertex(name?: string, info?: any): void {
         this.vertexes.push(new Vertex(this.vertexes.length, name, info));

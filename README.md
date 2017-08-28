@@ -12,10 +12,27 @@ Maths.ts is a very extensive library for doing maths in TypeScript, JavaScript a
 Moreover, maths.ts is not limited to just some math functions. Maths.ts includes support for some well known algorithms such as graph's handling algorithms, some linear algebra approximation methods and algorithms, among others.
 
 ## Features
-- Support in any kind of number, graphs, matrices.
-- Support for arithmetic operations, algebra, analysis(pending), combinatorics(pending), geometry and topology(pending), probability and statistics(pending), computational sciences(pending), etc.
-- Some known algorithms: e.g. simplex algorithm, merge, bfs, etc.
-- Open source.
+* Support for real numbers and high accuracy operations between them.
+* Support for matrices and vectors and operations between them as well as their properties (determinant, transpose, etc.).
+* Support for arithmetic properties of some numbers (greatest common divisor, least common multiple, factors of a number).
+* Embedded algorithms implemented.
+  * Merge sort.
+  * Quick sort.
+  * Sieve of Eratosthenes.
+  * Graph search algorithms (BFS, DFS, a-star, greedy search, etc.).
+* Embedded data structures.
+  * Bit set.
+  * Matrix.
+  * Graph.
+* Open source.
+
+## Upcoming features
+* Support for algebraic expression and operations with them (derive, integrate, calculating the value of a variable, etc.).
+* Support for combinatorics, geometry and topology, probability and statistics, and many other computer science and mathematics related.
+* Embedded plotter for functions.
+* Embedded algorithms.
+  * Simplex algorithm.
+  * MODI algorithm for transportation theory problems.
 
 ## Installing
 Maths.ts is available as the `maths.ts` package on npm.
@@ -27,7 +44,7 @@ We are working on a website to upload several examples but at this time we only 
 
     var math = require('maths.ts');
     
-    a = math.eval('2*3'); // maths.ts obj {6}
+    a = math.evaluate('2*3'); // maths.ts obj {6}
     a.multiply(4); // maths.ts obj {24}
     
 Please use brackets to avoid ambiguities like 2^3^4. 2^3^4 may be interpreted as 2^(3^4) as well as (2^3)^4, throwing two different results.

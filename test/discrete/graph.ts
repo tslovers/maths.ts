@@ -45,58 +45,66 @@ describe('structures::Graph', () => {
 describe('graph::bfs', () => {
     it('Reachable element', () => {
         let logger: any = [];
-        expect(bfs(g, 0, 5)).to.equals(true);
-        expect(bfs(g, 2, 5, logger)).to.equals(true);
+        let solution = bfs(g, 0, 5);
+        expect(solution.reachable).to.equals(true);
+        solution = bfs(g, 2, 5, logger);
+        expect(solution.reachable).to.equals(true);
         expect(logger.pop().info.depth).to.equals(2);
-        expect(bfs(g, 5, 8, logger)).to.equals(true);
-        expect(logger.pop().info.depth).to.equals(3);
+        solution = bfs(g, 5, 8);
+        expect(solution.reachable).to.equals(true);
+        expect(solution.depth).to.equals(3);
     });
 
     it('Unreachable element', () => {
-        expect(bfs(g, 3, 9, [])).to.equals(false);
-        expect(bfs(g, 1, 9)).to.equals(false);
+        expect(bfs(g, 3, 9).reachable).to.equals(false);
+        expect(bfs(g, 1, 9).reachable).to.equals(false);
     });
 });
 
 describe('graph::dfs', () => {
     it('Reachable element', () => {
-        expect(dfs(g, 0, 5, [])).to.equals(true);
-        expect(dfs(g, 2, 5)).to.equals(true);
+        expect(dfs(g, 0, 5, []).reachable).to.equals(true);
+        expect(dfs(g, 2, 5).reachable).to.equals(true);
     });
 
     it('Unreachable element', () => {
-        expect(dfs(g, 3, 9, [])).to.equals(false);
-        expect(dfs(g, 1, 9)).to.equals(false);
+        expect(dfs(g, 3, 9, []).reachable).to.equals(false);
+        expect(dfs(g, 1, 9).reachable).to.equals(false);
     });
 });
 
 describe('graph::idfs', () => {
     it('Reachable element', () => {
         let logger: Logger = [];
-        expect(idfs(g, 0, 5, logger)).to.equals(true);
-        expect(idfs(g, 0, 5)).to.equals(true);
+        let solution = idfs(g, 0, 5, logger);
+        expect(solution.reachable).to.equals(true);
+        solution = idfs(g, 0, 5);
+        expect(solution.reachable).to.equals(true);
         expect(logger.pop().info.depth).to.equals(3);
+        expect(solution.depth).to.equals(3);
     });
 
     it('Unreachable element', () => {
-        expect(idfs(g, 0, 9, [])).to.equals(false);
-        expect(idfs(g, 5, 9)).to.equals(false);
+        expect(idfs(g, 0, 9, []).reachable)
+            .to.equals(false);
+        expect(idfs(g, 5, 9).reachable).to.equals(false);
     });
 });
 
 describe('graph::ucs', () => {
     it('Reachable element', () => {
         let logger: Logger = [];
-        expect(ucs(g, 0, 5)).to.equals(true);
-        expect(ucs(g, 0, 5, logger)).to.equals(true);
-        expect(logger.pop().info.cost).to.equals(35);
-        expect(ucs(g, 2, 8, logger)).to.equals(true);
+        let solution = ucs(g, 0, 5, logger);
+        expect(ucs(g, 0, 5).reachable).to.equals(true);
+        expect(solution.reachable).to.equals(true);
+        expect(solution.cost).to.equals(35);
+        expect(ucs(g, 2, 8, logger).reachable).to.equals(true);
         expect(logger.pop().info.cost).to.equals(50);
     });
 
     it('Unreachable element', () => {
-        expect(ucs(g, 6, 9, [])).to.equals(false);
-        expect(ucs(g, 7, 9)).to.equals(false);
+        expect(ucs(g, 6, 9, []).reachable).to.equals(false);
+        expect(ucs(g, 7, 9).reachable).to.equals(false);
     });
 });
 
@@ -106,28 +114,33 @@ g.setHeuristic((s: Vertex, d: Vertex) => Math.abs(d.id - s.id));
 describe('graph::greedy', () => {
     it('Reachable element', () => {
         let logger: Logger = [];
-        expect(greedySearch(g, 0, 8, logger)).to.equals(true);
-        expect(greedySearch(g, 2, 7)).to.equals(true);
+        expect(greedySearch(g, 0, 8, logger).reachable)
+            .to.equals(true);
+        expect(greedySearch(g, 2, 7).reachable).to.equals(true);
     });
 
     it('Unreachable element', () => {
-        expect(greedySearch(g, 8, 9, [])).to.equals(false);
-        expect(greedySearch(g, 4, 9)).to.equals(false);
+        expect(greedySearch(g, 8, 9, []).reachable)
+            .to.equals(false);
+        expect(greedySearch(g, 4, 9).reachable).to.equals(false);
     });
 });
 
 describe('graph::aStar', () => {
     it('Reachable element', () => {
         let logger: Logger = [];
-        expect(aStar(g, 0, 5, logger)).to.equals(true);
+        let solution = aStar(g, 5, 0, logger);
+        expect(aStar(g, 0, 5, logger).reachable)
+            .to.equals(true);
         expect(logger.pop().info.cost).to.equals(35);
-        expect(aStar(g, 5, 0, logger)).to.equals(true);
-        expect(logger.pop().info.cost).to.equals(35);
-        expect(aStar(g, 0, 5)).to.equals(true);
+        expect(solution.reachable).to.equals(true);
+        expect(solution.cost).to.equals(35);
+        expect(aStar(g, 0, 5).reachable).to.equals(true);
     });
 
     it('Unreachable element', () => {
-        expect(aStar(g, 3, 9, [])).to.equals(false);
-        expect(aStar(g, 0, 9)).to.equals(false);
+        expect(aStar(g, 3, 9, []).reachable)
+            .to.equals(false);
+        expect(aStar(g, 0, 9).reachable).to.equals(false);
     });
 });

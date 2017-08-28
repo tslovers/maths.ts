@@ -17,6 +17,16 @@
 
 import Node from './Node';
 
+/**
+ * Creates and expression from a given one, then returns the equivalent for
+ * that expression as a math object.
+ * @param exp The expression to be evaluated.
+ * @return A Node object containing the value of the expression.
+ */
+export function evaluate(exp: string): Node {
+    return new Node(exp);
+}
+
 export {
     Node as Expression
 };

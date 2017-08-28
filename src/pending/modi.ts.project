@@ -1,0 +1,75 @@
+import {Real} from "../numbers";
+import {UnpolishedTransportModel, Approximation, TransportTableau} from "./";
+
+const MAX_ITERATIONS = 100;
+
+/**
+ * MODI Method or UV Method solves transportation problems.
+ * Transportation problems models must be specified as TransportModel interface is,
+ * providing at least: a cost matrix, a supply vector and a demand vector.
+ * @param model The Transport model with matrix, supply and demand. Supply names & demand names are optional.
+ * @param logger An array where to log the steps about algorithm execution.
+ * @param aMethod The approximation method to be used to find a basic feasible solution.
+ * @param maxIterations The maximum number of iterations in case the solution has not been found.
+ * @return {Real} The value for the optimum solution.
+ */
+export function modiMethod(model: UnpolishedTransportModel = MODI_TEST_CASES.swimmers,
+                           logger: any = [],
+                           aMethod: Approximation = Approximation.Vogel,
+                           maxIterations: number = MAX_ITERATIONS): any {
+    var ms: TransportTableau = new TransportTableau(model, logger, aMethod);
+
+    // Go until its solved or max iteration have been reached.
+    for (var i = 1; i < maxIterations && !ms.isSolved(); i++) {
+        logger.push({info: 'MODI :: It ' + i});
+        ms.nextIteration();
+    }
+
+    return ms.getCurrentValue();
+}
+
+export const uvMethod = modiMethod;
+
+
+/**
+ * Test cases for MODI algorithm.
+ */
+export const MODI_TEST_CASES: any = {
+    swimmers: {
+        matrix: [
+            [37.7, 32.9, 33.8, 37],
+            [43.4, 33.1, 42.2, 34.7],
+            [33.3, 28.5, 38.9, 30.4],
+            [29.2, 26.4, 29.6, 28.5]
+        ],
+        supply: [1, 1, 1, 1],
+        demand: [1, 1, 1, 1],
+        demandNames: ['Carl', 'Chris', 'David', 'Tony'],
+        supplyNames: ['Backstroke', 'Breaststroke', 'Butterfly', 'Free'],
+        out: new Real(126.2)
+    },
+    windmills: {
+        matrix: [
+            [10, 2, 20, 11],
+            [12, 7, 9, 20],
+            [4, 14, 16, 18]
+        ],
+        supply: [15, 25, 10],
+        demand: [5, 15, 15, 15],
+        demandNames: ['Windmill 1', 'Windmill 2', 'Windmill 3', 'Windmill 4'],
+        supplyNames: ['Silo 1', 'Silo 2', 'Silo 3'],
+        out: new Real(435)
+    },
+    powerCo: {
+        matrix: [
+            [8, 6, 10, 9],
+            [9, 12, 13, 7],
+            [14, 9, 16, 5]
+        ],
+        supply: [35, 50, 40],
+        demand: [45, 20, 30, 30],
+        supplyNames: ['Plant 1', 'Plant 2', 'Plant 3'],
+        demandNames: ['City 1', 'City 2', 'City 3', 'City 4'],
+        out: new Real(1020)
+    }
+};

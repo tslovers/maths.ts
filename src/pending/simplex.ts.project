@@ -1,0 +1,244 @@
+import {Tableau, Goal} from './';
+import {Real, CustomNumber} from "../numbers";
+
+// TODO: Simplex function aesthetics may be improved.
+
+/**
+ * The simplex algorithm operates on linear programs in standard form:
+ * Goal (maximize or minimize):
+ *  Z = c^T * x
+ * Subject to
+ *  Ax <= b, Xi >= 0
+ * Where the inequation operator (<=) may change according to the problem.
+ * SimplexModel interface intends to represent a this standard form by holding
+ * c^T (cT), A, b, number of variables (nVars), relation or inequation operators (relation)
+ * and goal('min' or 'max' | Goal.Min or Goal.Max).
+ *
+ * NOTES:
+ *     * represents dot product.
+ *     Comments or suggestions on this model representation are welcome, I tried to expressed as well as possible.
+ *
+ * @interface SimplexModel
+ */
+export interface SimplexModel {
+    cT: CustomNumber[]; // Z function's coefficients (c vector transposed)
+    A: CustomNumber[][]; // Restrictions array coefficients (A)
+    b: CustomNumber[]; // b vector of restrictions right side of in equations
+    relation: string[]; // Restriction relation
+    nVars: number; // Number of variables for the model
+    goal: string; // Minimize or Maximize
+    out?: Real[]; // Expected output
+}
+
+/**
+ * Simplex algorithm implementation.
+ * @param model {SimplexModel} An abstraction of the simplex model as SimplexModel interface states.
+ * @param stepsInfo {any[]} An array where information about steps may needed to be saved (Optional)
+ * @return {Real[]} The solution array starting from [Z, x1, x2 .... s1, s2 ... ] being Z the
+ *  objective function, xi the original variables and si the slack variables.
+ * For a more detailed output stepsInfo must be sent, there the information about final solution will also be stacked.
+ */
+export function simplex(model: SimplexModel = SIMPLEX_TEST_CASES.minimizeTest, stepsInfo: any[] = []) {
+    var i, j;
+    var matrixNames: string[] = [];
+    var tableau = buildTableau(model, matrixNames);
+    var twoPhases = matrixNames[0] === 'W\'';
+
+    if (twoPhases)
+        firstPhase();
+    secondPhase();
+
+    return tableau.getSolution();
+
+    function firstPhase() {
+        stepsInfo.push({info: 'Two phases method used'});
+        stepsInfo.push({
+            info: 'First phase',
+            expressiveTableau: tableau.toHTMLTable()
+        });
+
+        tableau.clearBasics();
+        stepsInfo.push({
+            info: 'Initial tableau',
+            expressiveTableau: tableau.toHTMLTable()
+        });
+
+        solveTableau();
+
+        var mn = ['Z'];
+        var m = [[new Real(1)]];
+        var basics = tableau.getBasics();
+        var mat = tableau.getRealMatrix();
+        for (i = 1; i < matrixNames.length; i++)
+            if (matrixNames[i][0] !== 'r') {
+                mn.push(matrixNames[i]);
+                for (j = 1; j < mat.length; j++) {
+                    if (i === 1)
+                        m.push([new Real(0)]);
+                    m[j].push(mat[j][i]);
+                }
+            }
+        for (i = 1; i < basics.length; i++)
+            for (j = 1; j < mn.length; j++)
+                if (matrixNames[basics[i]] === mn[j])
+                    basics[i] = j;
+        matrixNames = mn;
+        for (j = 0; j < model.cT.length; j++)
+            m[0].push(new Real(-model.cT[j]));
+        for (j += 1; j < matrixNames.length; j++)
+            m[0].push(new Real(0));
+
+        twoPhases = false;
+        tableau = new Tableau(m, basics, model.goal === 'min' ? Goal.Min : Goal.Max);
+        stepsInfo.push({
+            info: 'Second phase',
+            expressiveTableau: tableau.toHTMLTable()
+        });
+        tableau.clearBasics();
+    }
+
+    function secondPhase() {
+        stepsInfo.push({
+            info: 'Initial tableau',
+            expressiveTableau: tableau.toHTMLTable()
+        });
+
+        solveTableau();
+
+        stepsInfo.push({
+            info: 'Solved',
+            solution: tableau.getStringSolution()
+        });
+    }
+
+    function solveTableau() {
+        for (var i = 1; !tableau.isSolved(); i++) {
+            tableau.nextIteration();
+            stepsInfo.push({
+                info: i + ' Iteration',
+                expressiveTableau: tableau.toHTMLTable()
+            });
+        }
+    }
+}
+
+function buildTableau(model: SimplexModel, matrixNames: string[]) {
+    var twoPhases = false;
+    var basics: number[] = [0];
+    matrixNames = getNames();
+    var matrix: CustomNumber[][] = getMatrix();
+
+    return new Tableau(matrix, basics, (twoPhases || model.goal === 'min') ? Goal.Min : Goal.Max, matrixNames);
+
+    function getNames(): string[] {
+        var mn: string[] = ['Z'];
+
+        for (var i = 1; i <= model.nVars; i++)
+            mn.push('x' + i);
+        for (var i = 0; i < model.A.length; i++) {
+            if (model.relation[i] === '<=') {
+                mn.push('s' + (i + 1));
+                basics.push(mn.length - 1);
+            } else {
+                twoPhases = true;
+                if (model.relation[i] === '>=')
+                    mn.push('s' + (i + 1));
+                mn.push('r' + (i + 1));
+                basics.push(mn.length - 1);
+            }
+        }
+        mn.push('Res');
+
+        return mn;
+    }
+
+    function getMatrix(): CustomNumber[][] {
+        var m: CustomNumber[][] = [[1]];
+
+        for (var i = 0; i < model.A.length; i++) {
+            m.push([0]);
+            for (var j = 0; j < model.A[i].length; j++)
+                m[i + 1].push(model.A[i][j]);
+            j++;
+            for (; j < matrixNames.length; j++) {
+                switch (matrixNames[j][0]) {
+                    case 'r':
+                        m[i + 1].push((matrixNames[j].slice(1) === ('' + (i + 1))) ? 1 : 0);
+                        break;
+                    case 's':
+                        m[i + 1].push((matrixNames[j].slice(1) === ('' + (i + 1))) ? (model.relation[i] === '<=' ? 1 : -1) : 0);
+                        break;
+                    case 'R':
+                        m[i + 1].push(model.b[i]);
+                        break;
+                    default:
+                        console.log('WTF?');
+                }
+            }
+        }
+
+        if (twoPhases) {
+            matrixNames[0] = 'W\'';
+            for (var i = 1; i < matrixNames.length - 1; i++)
+                if (matrixNames[i][0] === 'r')
+                    m[0][i] = -1;
+                else
+                    m[0][i] = 0;
+            m[0].push(0);
+        } else {
+            for (var i = 1; i < matrixNames.length - 1; i++)
+                if (matrixNames[i][0] === 'x')
+                    m[0].push(-model.cT[i - 1]);
+                else
+                    m[0].push(0);
+            m[0].push(0);
+        }
+
+        return m;
+    }
+}
+
+/**
+ * Represents a test for simplex algorithm.
+ * @type SimplexModel
+ */
+export const SIMPLEX_TEST_CASES: any = {
+    'Minimize test 1': {
+        cT: [2, 3],
+        A: [
+            [3, 2],
+            [2, -4],
+            [4, 3]
+        ],
+        b: [14, 2, 19],
+        relation: ['=', '>=', '<='],
+        nVars: 2,
+        goal: 'min',
+        out: [
+            new Real(28, 3),
+            new Real(14, 3),
+            new Real(0),
+            new Real(22, 3),
+            new Real(1, 3)
+        ]
+    },
+    'Maximize test 1': {
+        cT: [2, 3],
+        A: [
+            [3, 2],
+            [2, -4],
+            [4, 3]
+        ],
+        b: [14, 2, 19],
+        relation: ['=', '>=', '<='],
+        nVars: 2,
+        goal: 'max',
+        out: [
+            new Real(11),
+            new Real(4),
+            new Real(1),
+            new Real(2),
+            new Real(0)
+        ]
+    }
+};

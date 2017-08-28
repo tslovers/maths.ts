@@ -1,0 +1,494 @@
+import {Matrix} from "./Matrix";
+import {Real, CustomNumber} from "../numbers";
+import {Coordinate} from "../plotter/index";
+import {addCustomNumber} from "../numbers/CustomNumber";
+
+// TODO: Document
+
+export interface UnpolishedTransportModel {
+    matrix: CustomNumber[][]; // A matrix with the respective costs
+    demand: CustomNumber[]; // A vector with respective demand
+    supply: CustomNumber[]; // A vector with respective supply
+    demandNames?: string[]; // A vector with respective names for demand
+    supplyNames?: string[]; // A vector with respective names for supply
+    out?: Real; // Expected output
+}
+
+export interface TransportModel {
+    matrix: Real[][]; // A matrix with respective cost
+    demand: Real[]; // A vector with respective demand
+    supply: Real[]; // A vector with respective supply
+    demandNames?: string[]; // A vector with respective demandNames
+    supplyNames?: string[]; // A vector with respective supplyNames
+    out?: Real; // Expected output
+}
+
+/**
+ * A class that solves transportation models using modiMethod method.
+ */
+export class TransportTableau extends Matrix {
+    private assignment: Real[][]; // The current assignments
+    private demand: Real[];
+    private supply: Real[];
+    private demandNames: string[];
+    private supplyNames: string[];
+    private basics: Coordinate[];
+    private solved: boolean;
+    private logger: any[];
+
+    /**
+     * Builds the transportation model to fit this specification.
+     * @param model The model.
+     * @param logger An array to save execution steps.
+     * @param approxMethod How to get the basic feasible solution.
+     */
+    constructor(model: UnpolishedTransportModel, logger: any = [], approxMethod: Approximation = Approximation.Vogel) {
+        super(model.matrix);
+
+        this.solved = false;
+        this.logger = logger;
+        this.assignment = model.matrix.map((r) => r.map(() => {
+            return new Real(0);
+        }));
+        this.supply = model.supply.map((r) => new Real(r));
+        this.demand = model.demand.map((r) => new Real(r));
+        this.demandNames = model.demandNames ? model.demandNames : TransportTableau.genNames(this.matrix[0].length, 'D');
+        this.supplyNames = model.supplyNames ? model.supplyNames : TransportTableau.genNames(this.matrix[0].length, 'S');
+        this.basics = [];
+
+        if (this.supply.reduce(addCustomNumber).compare(model.demand.reduce(addCustomNumber), '!=')) {
+            // TODO: Add extra variables. How to?
+        }
+        var newModel: TransportModel = {
+            matrix: model.matrix.map((r) => r.map((i) => {
+                return new Real(i);
+            })),
+            supply: model.supply.map((r) => new Real(r)),
+            demand: model.demand.map((r) => new Real(r))
+        };
+
+        if (approxMethod === Approximation.Vogel)
+            this.vogelApproximation(newModel);
+        else if (approxMethod === Approximation.LeastCost)
+            this.leastCostMethod(newModel);
+        else
+            this.northWestCorner(newModel);
+    }
+
+    /**
+     *
+     * @param matrix
+     * @return {any}
+     */
+    public getHTMLTable(matrix: string[][]): JQuery | string[][] {
+        try {
+            var $table = $('<table>');
+
+            $table.append($('<tr>').append($('<th>')));
+            for (var i = 0; i < this.demandNames.length; i++)
+                $table.children().last().append($('<th>', {html: this.demandNames[i]}));
+            $table.children().last().append($('<th>', {html: 'Supply'}));
+
+            for (var i = 0; i < this.supply.length; i++) {
+                $table.append($('<tr>').append($('<th>', {html: this.supplyNames[i]})));
+
+                for (var j = 0; j < this.demand.length; j++) {
+                    var aux: string[] = matrix[i][j].split('|');
+                    var cell: any = {
+                        basic: aux.length > 1 && aux[1][0] === 'b',
+                        cost: aux[0],
+                        multiplier: (aux.length > 2) ? aux[2] : undefined,
+                        state: (aux.length > 3) ? aux[3] : undefined,
+                        assignment: (aux.length > 1 && aux[1][0] === 'b') ?
+                            aux[1].replace('b', '') : ((aux.length > 1) ? aux[1] : undefined)
+                    };
+
+                    var $td = $('<td>', {html: cell.cost});
+                    if (cell.basic)
+                        $td.addClass('basic');
+                    if (cell.state && cell.state === 'in')
+                        $td.addClass('inner');
+                    else if (cell.state && cell.state === 'out')
+                        $td.addClass('outer');
+                    if (cell.assignment)
+                        $td.append($('<span>', {
+                            html: '[' + cell.assignment + ']',
+                        }).addClass('assignment'));
+                    if (cell.multiplier) {
+                        $td.append($('<span>', {
+                            html: cell.multiplier,
+                        }).addClass('multiplier'));
+                    }
+
+                    $table.children().last().append($td);
+
+                }
+
+                $table.children().last().append($('<td>', {html: this.supply[i] + ''}));
+            }
+            $table.append($('<tr>'));
+            $table.children().last().append($('<th>', {html: 'Demand'}));
+            for (var j = 0; j < this.demand.length; j++)
+                $table.children().last().append($('<td>', {html: this.demand[j] + ''}));
+            $table.children().last().append($('<td>', {html: this.demand.reduce(addCustomNumber) + ''}));
+
+
+            return $table;
+        } catch (e) {
+            return matrix.map((r) => r.map((i) => i));
+        }
+    }
+
+    /**
+     * Performs the next steps (if it's not solved yet).
+     * 1. Finds next inner variable.
+     * 2. Calculates the closed cycle.
+     * 3. Updates in cycle.
+     */
+    public nextIteration() {
+        var coord: Coordinate = this.nextBasicProposal();
+        var mat: string[][] = [];
+
+        for (var i = 0; i < this.matrix.length; i++) {
+            mat.push([]);
+            for (var j = 0; j < this.matrix[i].length; j++)
+                mat[i].push(this.matrix[i][j] + '|' + (this.isBasic(j, i) ? 'b' : '') + this.assignment[i][j]);
+        }
+        this.logger.push({
+            info: 'Getting next inner variable',
+            htmlTable: this.getHTMLTable(mat)
+        });
+
+        if (coord === null) {
+            this.solved = true;
+            var solution = '';
+            for (var i = 0; i < this.basics.length; i++) {
+                if (solution.length)
+                    solution += ' + ';
+                if (this.assignment[this.basics[i].y][this.basics[i].x].value() !== 0)
+                    solution += '(' + this.assignment[this.basics[i].y][this.basics[i].x] + ')' +
+                        '(' + this.matrix[this.basics[i].y][this.basics[i].x] + ')';
+            }
+            this.logger.push({
+                info: 'Solved!',
+                solution: solution
+            });
+            return;
+        }
+
+        var cycle: Coordinate[];
+        var theta: Real;
+        cycle = this.getCycle(coord);
+        theta = new Real(Infinity);
+        for (var i = 1; i < cycle.length; i++)
+            if ((i & 1) === 1 && theta.compare(this.assignment[cycle[i].y][cycle[i].x], '>')) {
+                theta = this.assignment[cycle[i].y][cycle[i].x].copy();
+                coord = {x: cycle[i].x, y: cycle[i].y};
+            }
+        for (var i = 0; i < cycle.length; i++)
+            if ((i & 1) === 1) {
+                this.assignment[cycle[i].y][cycle[i].x].subtractHere(theta);
+                mat[cycle[i].y][cycle[i].x] += '|(-)';
+            } else {
+                this.assignment[cycle[i].y][cycle[i].x].addHere(theta);
+                mat[cycle[i].y][cycle[i].x] += '|(+)';
+            }
+        this.assignment[cycle[0].y][cycle[0].x] = theta;
+        mat[cycle[0].y][cycle[0].x] += '|in';
+        mat[coord.y][coord.x] += '|out';
+        for (var i = 0; i < this.basics.length; i++)
+            if (this.basics[i].x === coord.x && this.basics[i].y === coord.y) {
+                this.basics[i] = cycle[0];
+                break;
+            }
+
+        this.logger.push({
+            info: 'Modi:: iteration',
+            htmlTable: this.getHTMLTable(mat),
+            theta: '' + theta
+        });
+    }
+
+    public getCurrentValue(): Real {
+        var value: Real = new Real(0);
+        for (var i = 0; i < this.basics.length; i++)
+            value.addHere(
+                this.assignment[this.basics[i].y][this.basics[i].x]
+                    .multiply(this.matrix[this.basics[i].y][this.basics[i].x]));
+        return value;
+    }
+
+    private getCycle(start: Coordinate): Coordinate[] {
+        var queue: Coordinate[][] = [[start]];
+        while (queue.length > 0) {
+            var last = queue[0][queue[0].length - 1];
+
+            for (var i = 0; i < this.basics.length; i++) {
+                if (queue[0].length > 3 &&
+                    (last.x === queue[0][0].x || last.y === queue[0][0].y))
+                    return queue[0];
+                if (!TransportTableau.isInArray(queue[0], this.basics[i]) &&
+                    (last.x === this.basics[i].x || last.y === this.basics[i].y)) {
+                    var cycle = TransportTableau.copyCoordArray(queue[0]);
+                    cycle.push(this.basics[i]);
+                    queue.push(cycle);
+                }
+            }
+            queue.shift();
+        }
+
+        return null;
+    }
+
+    private static isInArray(array: Coordinate[], c: Coordinate): boolean {
+        for (var i = 0; i < array.length; i++)
+            if (array[i].x === c.x && array[i].y === c.y)
+                return true;
+        return false;
+    }
+
+    private static copyCoordArray(array: Coordinate[]): Coordinate[] {
+        return array.map((i) => i);
+    }
+
+    private nextBasicProposal(): Coordinate {
+        var ui: Real[] = this.matrix.map(() => new Real(NaN));
+        var vj: Real[] = this.matrix[0].map(() => new Real(NaN));
+        var newBasicCoord: Coordinate = null;
+        var flag: boolean = true;
+
+        ui[0] = new Real(0);
+        for (; flag;) {
+            flag = false;
+            for (var i = 0; i < this.assignment.length; i++) {
+                for (var j = 0; j < this.assignment[i].length; j++) {
+                    if (this.isBasic(j, i)) {
+                        if (ui[i].isNaN() && !vj[j].isNaN())
+                            ui[i] = this.matrix[i][j].subtract(vj[j]);
+                        else if (vj[j].isNaN() && !ui[i].isNaN())
+                            vj[j] = this.matrix[i][j].subtract(ui[i]);
+                        else if (vj[j].isNaN() && ui[i].isNaN())
+                            flag = true;
+                    }
+                }
+            }
+        }
+
+        var aux: Real = new Real(0);
+        for (var i = 0; i < this.assignment.length; i++)
+            for (var j = 0; j < this.assignment[i].length; j++)
+                if (!this.isBasic(j, i)) {
+                    this.assignment[i][j] = ui[i].add(vj[j]).subtract(this.matrix[i][j]);
+                    if (this.assignment[i][j].compare(aux, '>')) {
+                        newBasicCoord = {x: j, y: i};
+                        aux = this.assignment[i][j];
+                    }
+                }
+
+        return newBasicCoord;
+    }
+
+    private isBasic(x: number, y: number): boolean {
+        for (var i = 0; i < this.basics.length; i++)
+            if (this.basics[i].x === x && this.basics[i].y === y)
+                return true;
+        return false;
+    }
+
+    public isSolved() {
+        return this.solved;
+    }
+
+    private vogelApproximation(model: TransportModel): void {
+        this.logger.push({info: 'Getting solution with vogel approximation method.'});
+        var mat: string[][] = this.matrix.map((r) => r.map((i) => i + ''));
+
+        for (var i = 1; i < this.supply.length + this.demand.length; i++) {
+            var maxDifCoord: Coordinate = TransportTableau.vogelGetNextBasic(model.matrix);
+            var aux: Real;
+
+            if (model.supply[maxDifCoord.y].compare(model.demand[maxDifCoord.x], '>')) {
+                aux = model.demand[maxDifCoord.x].copy();
+                for (var j = 0; j < model.matrix.length; j++)
+                    model.matrix[j][maxDifCoord.x] = new Real(Infinity);
+            } else {
+                aux = model.supply[maxDifCoord.y].copy();
+                for (var j = 0; j < model.matrix[0].length; j++)
+                    model.matrix[maxDifCoord.y][j] = new Real(Infinity);
+            }
+
+            mat[maxDifCoord.y][maxDifCoord.x] = mat[maxDifCoord.y][maxDifCoord.x] + '|b' + aux;
+            this.assignment[maxDifCoord.y][maxDifCoord.x] = aux;
+            this.basics.push(maxDifCoord);
+            model.supply[maxDifCoord.y].subtractHere(aux);
+            model.demand[maxDifCoord.x].subtractHere(aux);
+
+            this.logger.push({
+                info: 'Vogel: It ' + i + '.',
+                htmlTable: this.getHTMLTable(mat)
+            });
+        }
+    }
+
+    private northWestCorner(model: TransportModel): void {
+        var mat: string[][] = this.matrix.map((r) => r.map((i) => i + ''));
+        this.logger.push({info: 'Getting solution with north-west corner approximation method.'});
+        var nextCoord: Coordinate = {x: 0, y: 0};
+        var aux: Real;
+
+        for (var i = 1; i < model.supply.length + model.demand.length; i++) {
+            var coord: Coordinate = nextCoord;
+            if (model.supply[coord.y].compare(model.demand[coord.x], '>')) {
+                aux = model.demand[coord.x].copy();
+                this.assignment[coord.y][coord.x] = aux;
+                nextCoord = {x: coord.x + 1, y: coord.y};
+            } else {
+                aux = model.supply[coord.y].copy();
+                this.assignment[coord.y][coord.x] = aux;
+                nextCoord = {x: coord.x, y: coord.y + 1};
+            }
+            this.basics.push(coord);
+            mat[coord.y][coord.x] = mat[coord.y][coord.x] + '|b' + aux;
+            model.supply[coord.y].subtractHere(aux);
+            model.demand[coord.x].subtractHere(aux);
+            this.logger.push({
+                info: 'NWC: It ' + i + '.',
+                htmlTable: this.getHTMLTable(mat)
+            });
+        }
+    }
+
+    private leastCostMethod(model: TransportModel): void {
+        var mat: string[][] = this.matrix.map((r) => r.map((i) => i + ''));
+        this.logger.push({info: 'Getting solution with least cost corner approximation method.'});
+
+        for (var i = 1; i < this.supply.length + this.demand.length; i++) {
+            var coord: Coordinate = TransportTableau.leastCostGetNextBasic(model.matrix);
+            var aux: Real;
+
+            if (model.supply[coord.y].compare(model.demand[coord.x], '>')) {
+                aux = model.demand[coord.x].copy();
+                for (var j = 0; j < model.matrix.length; j++)
+                    model.matrix[j][coord.x] = new Real(Infinity);
+            } else {
+                aux = model.supply[coord.y].copy();
+                for (var j = 0; j < model.matrix[0].length; j++)
+                    model.matrix[coord.y][j] = new Real(Infinity);
+            }
+
+            mat[coord.y][coord.x] = mat[coord.y][coord.x] + '|b' + aux;
+            this.assignment[coord.y][coord.x] = aux;
+            this.basics.push(coord);
+            model.supply[coord.y].subtractHere(aux);
+            model.demand[coord.x].subtractHere(aux);
+
+            this.logger.push({
+                info: 'Least Cost: It ' + i + '.',
+                htmlTable: this.getHTMLTable(mat)
+            });
+        }
+    }
+
+    private static leastCostGetNextBasic(matrix: Real[][]): Coordinate {
+        var c: Coordinate;
+        var aux: Real = new Real(Infinity);
+
+        for (var i = 0; i < matrix.length; i++)
+            for (var j = 0; j < matrix[i].length; j++)
+                if (aux.compare(matrix[i][j], '>')) {
+                    aux = matrix[i][j];
+                    c = {x: j, y: i};
+                }
+
+        return c;
+    }
+
+    private static vogelGetNextBasic(matrix: Real[][]): Coordinate {
+        var maxDif: Real = new Real(-1);
+        var aux: Real;
+        var coord: Coordinate = {x: -1, y: -1};
+
+        for (var i = 0; i < matrix[0].length; i++) {
+            aux = TransportTableau.vogelCalcDifference('x', i, matrix);
+            if (aux.compare(maxDif, '>') && aux.value() !== Infinity) {
+                maxDif = aux;
+                coord.x = i;
+            }
+        }
+        for (var i = 0; i < matrix.length; i++) {
+            aux = TransportTableau.vogelCalcDifference('y', i, matrix);
+            if (aux.compare(maxDif, '>') && aux.value() !== Infinity) {
+                maxDif = aux;
+                coord.y = i;
+                coord.x = -1;
+            }
+        }
+
+        aux = new Real(Infinity);
+        if (coord.x === -1 && coord.y !== -1)
+            for (var i = 0; i < matrix[0].length; i++) {
+                if (aux.compare(matrix[coord.y][i], '>')) {
+                    aux = matrix[coord.y][i];
+                    coord.x = i;
+                }
+            }
+        else if (coord.x !== -1 && coord.y === -1)
+            for (var i = 0; i < matrix.length; i++) {
+                if (aux.compare(matrix[i][coord.x], '>')) {
+                    aux = matrix[i][coord.x];
+                    coord.y = i;
+                }
+            }
+        else if (coord.x === -1 && coord.y === -1)
+            for (var i = 0; i < matrix.length; i++)
+                for (var j = 0; j < matrix[0].length; j++)
+                    if (matrix[i][j].value() !== Infinity)
+                        return {x: j, y: i};
+
+        return coord;
+    }
+
+    private static vogelCalcDifference(axis: string, k: number, matrix: Real[][]): Real {
+        var min: Real = new Real(Infinity);
+        var closeMin: Real = new Real(Infinity);
+
+        if (axis === 'x') {
+            for (var i = 0; i < matrix.length; i++)
+                if (min.compare(matrix[i][k], '>=')) {
+                    closeMin = min;
+                    min = matrix[i][k];
+                } else if (closeMin.compare(matrix[i][k], '>')) {
+                    closeMin = matrix[i][k];
+                }
+        } else {
+            for (var i = 0; i < matrix[0].length; i++)
+                if (min.compare(matrix[k][i], '>=')) {
+                    closeMin = min;
+                    min = matrix[k][i];
+                } else if (closeMin.compare(matrix[k][i], '>')) {
+                    closeMin = matrix[k][i];
+                }
+        }
+
+        return closeMin.subtract(min);
+    }
+
+    public getFeasibleBasicSolution() {
+        // TODO
+    }
+
+    private static genNames(n: number, s: string = ''): string[] {
+        var out = [];
+
+        for (var i = 1; i <= n; i++)
+            out.push(s + i);
+
+        return out;
+    }
+}
+
+export enum Approximation {
+    Vogel,
+    LeastCost,
+    NorthWestCorner
+}

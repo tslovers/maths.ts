@@ -1,0 +1,35 @@
+// Test file
+/**
+describe('algorithms::simplex', () => {
+    it('Maximize test', () => {
+        var out = simplex(SIMPLEX_TEST_CASES['Maximize test 1']);
+        compareRNumberArrays(out, SIMPLEX_TEST_CASES['Maximize test 1'].out);
+    });
+    it('Minimize test', () => {
+        var out = simplex(SIMPLEX_TEST_CASES['Minimize test 1']);
+        compareRNumberArrays(out, SIMPLEX_TEST_CASES['Minimize test 1'].out);
+    });
+});
+
+describe('algorithms::modiMethod', () => {
+    it('Swimmers', () => {
+        var out = modiMethod(MODI_TEST_CASES.swimmers);
+        expect(out.value()).to.equals(MODI_TEST_CASES.swimmers.out.value());
+    });
+    it('Windmill', () => {
+        var out = modiMethod(MODI_TEST_CASES.windmills);
+        expect(out.value()).to.equals(MODI_TEST_CASES.windmills.out.value());
+    });
+    it('Power Co', () => {
+        var out = modiMethod(MODI_TEST_CASES.powerCo);
+        expect(out.value()).to.equals(MODI_TEST_CASES.powerCo.out.value());
+    });
+});
+
+function compareRNumberArrays(arr1: Real[], arr2: Real[]): void {
+    if (arr1.length !== arr2.length)
+        return;
+    for (var i = 0; i < arr1.length; i++)
+        expect(arr1[i].value()).to.equals(arr2[i].value());
+}
+ */

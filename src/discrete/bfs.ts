@@ -17,7 +17,7 @@
 
 import Graph from '../structures/Graph';
 import {Logger} from '../algorithms';
-import {graphSearch, VertexElement} from './graphSearch';
+import {graphSearch, GraphSearchSolution, VertexElement} from './graphSearch';
 
 /**
  * A implementation of breadth first search algorithm.
@@ -25,10 +25,13 @@ import {graphSearch, VertexElement} from './graphSearch';
  * @param source The id of the source vertex.
  * @param destination The id of the destination vertex.
  * @param log Logs information about the algorithm execution.
- * @return true if the vertex is reachable from source graph, false otherwise.
+ * @return A GraphSearchSolution interface with its reachable element false
+ * if the destination element was not found in the graph. The reachable
+ * element will be true if the element was in the graph alongside with more
+ * information about cost, depth and trail to get to the solution.
  */
 export function bfs(graph: Graph, source: number, destination: number,
-                    log?: Logger): boolean {
+                    log?: Logger): GraphSearchSolution {
     return graphSearch(graph, source, destination, shift, push, log);
 }
 

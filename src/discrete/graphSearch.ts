@@ -19,6 +19,13 @@ import Graph from '../structures/Graph';
 import Vertex from '../structures/Vertex';
 import {Logger} from '../algorithms';
 
+export interface GraphSearchSolution {
+    trail?: string[];
+    cost?: number;
+    depth?: number;
+    reachable: boolean;
+}
+
 /**
  * An helping Interface for handling the vertex in list. It helps to store
  * information about the vertexes and the path followed to get there as well
@@ -47,12 +54,15 @@ export interface VertexElement {
  * @param outFunction The out function.
  * @param inFunction The in function.
  * @param logger An optional logger to knowing more about the algorithm.
- * @return true if the vertex is reachable from source graph, false otherwise.
+ * @return A GraphSearchSolution interface with its reachable element false
+ * if the destination element was not found in the graph. The reachable
+ * element will be true if the element was in the graph alongside with more
+ * information about cost, depth and trail to get to the solution.
  */
 export function graphSearch(graph: Graph, source: number, destination: number,
                             outFunction: () => VertexElement,
                             inFunction: (i: VertexElement) => any,
-                            logger?: Logger): boolean {
+                            logger?: Logger): GraphSearchSolution {
     // Initializing list with the source element
     let list: VertexList = {
         vertexes: [{
@@ -67,10 +77,7 @@ export function graphSearch(graph: Graph, source: number, destination: number,
         next: outFunction
     };
 
-    if (logger)
-        return lgs(list, destination, logger);
-    else
-        return gs(list, destination);
+    return gs(list, destination, logger);
 }
 
 /**
@@ -96,80 +103,58 @@ enum VertexStatus {
 }
 
 /**
- * Transverses the graph looking for destination.
- * @param list A initial list of vertexes to look for.
- * @param destination The goal of gs.
- * @return true if the vertex is reachable from source graph, false otherwise.
- */
-function gs(list: VertexList, destination: number): boolean {
-    // Until there is no more elements on list.
-    while (list.vertexes.length) {
-        let v = list.next();
-        // Update status for this node
-        list.status[v.id] = VertexStatus.VISITED;
-        // Wuu! Found!
-        if (v.id === destination)
-            return true;
-
-        v.vertex.edges.forEach(e => {
-            // Add all vertex on neighborhood if required
-            if (list.status[e.destination.id] === VertexStatus.NOT_VISITED) {
-                // Update status
-                list.status[e.destination.id] = VertexStatus.IN_QUEUE;
-
-                list.push({
-                    vertex: e.destination,
-                    id: e.destination.id,
-                    trail: null,
-                    cost: v.cost + e.weight,
-                    depth: v.depth + 1
-                });
-            }
-        });
-    }
-
-    return false;
-}
-
-/**
  * Transverses the graph looking for destination, besides, it informs about
  * every name and the final path to get to destination (if there is a solution).
  * @param list A initial list of vertexes to look for.
  * @param destination The goal of gs.
  * @param logger A logger about every name on the execution.
- * @return true if the vertex is reachable from source graph, false otherwise.
+ * @return A GraphSearchSolution interface with its reachable element false
+ * if the destination element was not found in the graph. The reachable
+ * element will be true if the element was in the graph alongside with more
+ * information about cost, depth and trail to get to the solution.
  */
-function lgs(list: VertexList, destination: number, logger: Logger): boolean {
-    logger.push({
-        name: 'Starting search of ' + destination + ' from ' +
-        list.vertexes[0].vertex.id,
-        info: {idVertexList: getInfo(list)}
-    });
+function gs(list: VertexList, destination: number,
+            logger: Logger): GraphSearchSolution {
+    if (logger)
+        logger.push({
+            name: 'Starting search of ' + destination + ' from ' +
+            list.vertexes[0].vertex.id,
+            info: {idVertexList: getInfo(list)}
+        });
+
     // Until there is no more elements on list.
     while (list.vertexes.length) {
         let v = list.next();
         list.status[v.id] = VertexStatus.VISITED; // Update status for this node
-        logger.push({
-            name: 'Current node: ' + v.id + (v.id === destination ?
-                ' -> its goal!' : ''),
-            info: {
-                addedVertexes: [],
-                ignoredVertexes: []
-            }
-        });
+        if (logger)
+            logger.push({
+                name: 'Current node: ' + v.id + (v.id === destination ?
+                    ' -> its goal!' : ''),
+                info: {
+                    addedVertexes: [],
+                    ignoredVertexes: []
+                }
+            });
 
         // Wuu! Found!
         if (v.id === destination) {
-            logger[logger.length - 1].info.idVertexList = getInfo(list);
-            logger.push({
-                name: 'Solution',
-                info: {
-                    trail: v.trail,
-                    cost: v.cost,
-                    depth: v.depth
-                }
-            });
-            return true;
+            if (logger) {
+                logger[logger.length - 1].info.idVertexList = getInfo(list);
+                logger.push({
+                    name: 'GraphSearchSolution',
+                    info: {
+                        trail: v.trail,
+                        cost: v.cost,
+                        depth: v.depth
+                    }
+                });
+            }
+            return {
+                trail: v.trail.map(i => i + ''),
+                cost: v.cost,
+                depth: v.depth,
+                reachable: true
+            };
         }
 
         v.vertex.edges.forEach(e => {
@@ -177,11 +162,12 @@ function lgs(list: VertexList, destination: number, logger: Logger): boolean {
             if (list.status[e.destination.id] !== VertexStatus.VISITED) {
                 // Update status
                 list.status[e.destination.id] = VertexStatus.IN_QUEUE;
-                logger[logger.length - 1].info
-                    .addedVertexes.push(e.destination.id);
+                if (logger)
+                    logger[logger.length - 1].info
+                        .addedVertexes.push(e.destination.id);
 
                 // Copy trail
-                let trail = v.trail.map(i => i);
+                let trail = v.trail.slice();
                 // Add this as new element on trail
                 trail.push(e.destination.id);
 
@@ -192,15 +178,18 @@ function lgs(list: VertexList, destination: number, logger: Logger): boolean {
                     cost: v.cost + e.weight,
                     depth: v.depth + 1
                 });
-            } else
+            } else if (logger)
                 logger[logger.length - 1].info
                     .ignoredVertexes.push(e.destination.id);
         });
 
-        logger[logger.length - 1].info.idVertexList = getInfo(list);
+        if (logger)
+            logger[logger.length - 1].info.idVertexList = getInfo(list);
     }
 
-    return false;
+    return {
+        reachable: false
+    };
 }
 
 /**

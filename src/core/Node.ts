@@ -117,6 +117,7 @@ export default class Node {
             }
             // Build this tree from the pieces obtained
             buildTree(this, pieces);
+            this.simplify();
         }
     }
 

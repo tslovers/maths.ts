@@ -1,0 +1,257 @@
+import {Matrix} from './Matrix';
+import {Real, CustomNumber} from '../numbers';
+
+/**
+ * A tableau used for simplex algorithm.
+ */
+export class Tableau extends Matrix {
+    private basics: number[];
+    private columnNames: string[];
+    private goal: Goal;
+    private solved: boolean;
+
+    /**
+     * Builds the tableau with given args.
+     * @constructor
+     * @param matrix The tableau.
+     * @param basics First basic variables of the tableau.
+     * @param goal Tableau's goal.
+     * @param columnNames The names of variables.
+     */
+    constructor(matrix: CustomNumber[][] | Matrix, basics: number[], goal: Goal, columnNames?: string[]) {
+        super(matrix);
+
+        this.goal = goal;
+        this.basics = [];
+        this.solved = false;
+        this.columnNames = (columnNames === undefined || columnNames.length !== this.matrix.length) ?
+            Tableau.defaultMatrixNames(this.matrix[0].length) : columnNames;
+
+        for (var i = 0; i < this.matrix.length; i++)
+            this.basics.push(basics[i]);
+    }
+
+    /**
+     * Goes through basic's array and pivots every row leaving basic variables only on it's respective row.
+     */
+    public clearBasics(): void {
+        for (var i = 1; i < this.basics.length; i++)
+            this.clearBasic(i);
+    }
+
+    /**
+     * Pivots with x=this.basics[i] and y=i.
+     * @param i The row to leave.
+     */
+    public clearBasic(i: number): void {
+        this.pivoting(this.basics[i], i);
+    }
+
+    /**
+     * Divides the y-th row between the row's x-th element, then pivots (super.pivoting).
+     * @param x Row to pivot.
+     * @param y Column to pivot.
+     */
+    public pivoting(x: number, y: number): void {
+        var aux = new Real(this.matrix[y][x]);
+
+        // Turns to 1 the pivot by dividing the entire row between pivot.
+        for (var i = 0; i < this.matrix[y].length; i++)
+            this.matrix[y][i].divideHere(aux);
+
+        super.pivoting(x, y);
+
+        this.basics[y] = x;
+    }
+
+    /**
+     * According to simplex algorithm it iterates on this tableau.
+     */
+    public nextIteration(): void {
+        var pivotX = this.getXPivot();
+        this.solved = !pivotX;
+
+        if (!this.solved) {
+            this.pivoting(pivotX, this.getYPivot(pivotX));
+            this.solved = !this.getXPivot();
+        }
+    }
+
+    /**
+     * Returns an array of objects {name, value} with the name of the vars and the value for the optimum solution.
+     * @return {Array} The objects representing the solution.
+     */
+    public getStringSolution(): any[] {
+        var solutions = [], vars = this.matrix[0].length - 1;
+
+        for (var i = 0; i < vars; i++) {
+            solutions.push({
+                value: '0',
+                name: this.columnNames[i]
+            });
+            for (var j = 0; j < this.basics.length; j++)
+                if (this.basics[j] === i)
+                    solutions[i].value = this.matrix[j][vars].toString();
+        }
+
+        return solutions;
+    }
+
+    /**
+     * Returns an array of RNumbers matching the solution vector for this tableau.
+     * @return {Array}
+     */
+    public getSolution(): Real[] {
+        var solutions = [], vars = this.matrix[0].length - 1;
+
+        for (var i = 0; i < vars; i++) {
+            solutions.push(new Real(0));
+            for (var j = 0; j < this.basics.length; j++)
+                if (this.basics[j] === i)
+                    solutions[i] = this.matrix[j][vars];
+        }
+
+        return solutions;
+    }
+
+    /**
+     * Returns the array of basic variables on the current tableau.
+     * @return {number[]}
+     */
+    public getBasics(): number[] {
+        return this.basics;
+    }
+
+    /**
+     * Determines if tableau is solved or not.
+     * @return {boolean} The solved state of tableau.
+     */
+    public isSolved(): boolean {
+        return this.solved;
+    }
+
+    /**
+     * Returns x pivot.
+     * @return {any} the next pivot.
+     */
+    private getXPivot(): number {
+        var pivotX;
+        var aux = new Real(0);
+
+        for (var i = 1; i < this.matrix[0].length - 1; i++) {
+            if (this.goal === Goal.Min) {
+                if (aux.value() < this.matrix[0][i].value()) {
+                    aux = this.matrix[0][i];
+                    pivotX = i;
+                }
+            } else {
+                if (aux.value() > this.matrix[0][i].value()) {
+                    aux = this.matrix[0][i];
+                    pivotX = i;
+                }
+            }
+        }
+
+        return pivotX;
+    }
+
+    /**
+     * Returns y pivot.
+     * @param pivotX The x pivot where to start.
+     * @return {any} The y position of pivot.
+     */
+    private getYPivot(pivotX: number): number {
+        var pivotY;
+        var aux: Real = new Real(Infinity);
+
+        for (var i = 1; i < this.matrix.length; i++) {
+            var coc: Real = this.matrix[i][this.matrix[i].length - 1].divide(this.matrix[i][pivotX]);
+            if (coc.value() < aux.value() && coc.value() >= 0) {
+                aux = coc;
+                pivotY = i;
+            }
+        }
+
+        return pivotY;
+    }
+
+    /**
+     * Returns an array with default names for matrix columns, from Z to Xi to Res.
+     * @param n The number of columns
+     * @return {string[]}
+     */
+    private static defaultMatrixNames(n: number): string[] {
+        var matrixNames = ['Z'];
+
+        for (var i = 1; i < n - 1; i++)
+            matrixNames.push('x' + i);
+        matrixNames.push('Res');
+
+        return matrixNames;
+    }
+
+    /**
+     * Returns a string matrix representing this tableau. It locates the basic variables at the left
+     * and the rest of the matrix as it must be represented.
+     * @return {Array}
+     */
+    public expressiveMatrix(): string[][] {
+        var matrix = [];
+
+        for (var i = 0; i < this.matrix.length; i++) {
+            matrix.push([this.columnNames[this.basics[i]]]);
+            for (var j = 1; j < this.matrix[i].length; j++)
+                matrix[i].push(this.matrix[i][j].toString());
+        }
+
+        matrix.unshift(['Bas']);
+        for (var i = 1; i < this.columnNames.length; i++)
+            matrix[0].push(this.columnNames[i]);
+
+        return matrix;
+    }
+
+    /**
+     * Returns this.expressiveMatrix in a HTML format in JQuery object.
+     * @return {JQuery | string[][]}
+     */
+    public toHTMLTable(): JQuery | string[][] {
+        try { // If JQuery is used.
+            var pivotX = this.getXPivot(), pivotY;
+            var $table = $('<table>');
+
+            if (pivotX)
+                pivotY = this.getYPivot(pivotX);
+
+            $table.append($('<tr>').append($('<th>', {html: 'Basic'})));
+            for (var i = 1; i < this.columnNames.length; i++) {
+                $table.children().last().append($('<th>', {html: this.columnNames[i]}));
+                if (pivotX === i)
+                    $table.children().last().children().last().addClass('j-pivot');
+            }
+
+            for (var i = 0; i < this.matrix.length; i++) {
+                $table.append($('<tr>').append($('<td>', {html: this.columnNames[this.basics[i]]})));
+                if (i === pivotY)
+                    $table.children().last().addClass('i-pivot');
+                for (var j = 1; j < this.matrix[i].length; j++) {
+                    $table.children().last().append($('<td>', {html: this.matrix[i][j].toString()}));
+                    if (j === pivotX)
+                        $table.children().last().children().last().addClass('j-pivot');
+                }
+            }
+
+            return $table;
+        } catch (e) { // If JQuery is not used.
+            return this.expressiveMatrix();
+        }
+    }
+}
+
+/**
+ * The main object for this tableau.
+ */
+export enum Goal {
+    Min,
+    Max
+}

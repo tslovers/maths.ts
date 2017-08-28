@@ -141,7 +141,7 @@ export default class Matrix {
      * @return This as a HTML table.
      * @throws Error if there is no window with a document.
      */
-    public toHTMLElement(): HTMLElement | string {
+    public toHTMLElement(): HTMLElement {
         let $table: JQuery = $('<table>');
 
         for (let i = 0; i < this.matrix.length; i++) {

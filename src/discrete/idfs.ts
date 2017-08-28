@@ -17,7 +17,7 @@
 
 import Graph from '../structures/Graph';
 import {Logger} from '../algorithms';
-import {graphSearch, VertexElement} from './graphSearch';
+import {graphSearch, GraphSearchSolution, VertexElement} from './graphSearch';
 
 const MAX_ITERATION_LIMIT = 100;
 
@@ -29,22 +29,25 @@ let i: number;
  * @param source The id of the source vertex.
  * @param destination The id of the destination vertex.
  * @param log Logs information about the algorithm execution.
- * @return true if the vertex is reachable from source graph, false otherwise.
+ * @return A GraphSearchSolution interface with its reachable element false
+ * if the destination element was not found in the graph. The reachable
+ * element will be true if the element was in the graph alongside with more
+ * information about cost, depth and trail to get to the solution.
  */
 export function idfs(graph: Graph, source: number,
-                     destination: number, log?: Logger): boolean {
-    let found: boolean;
+                     destination: number, log?: Logger): GraphSearchSolution {
+    let solution: GraphSearchSolution = {reachable: false};
 
-    for (i = 0; i < MAX_ITERATION_LIMIT && !found; i++) {
+    for (i = 0; i < MAX_ITERATION_LIMIT && !solution.reachable; i++) {
         if (log !== undefined)
             log.push({
                 name: 'Iterative DFS - Depth: ' + i,
                 info: {}
             });
-        found = graphSearch(graph, source, destination, pop, push, log);
+        solution = graphSearch(graph, source, destination, pop, push, log);
     }
 
-    return found;
+    return solution;
 }
 
 /**

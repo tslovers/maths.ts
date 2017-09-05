@@ -29,6 +29,7 @@ Moreover, maths.ts is not limited to just some math functions. Maths.ts includes
 ## Upcoming features
 * Support for algebraic expression and operations with them (derive, integrate, calculating the value of a variable, etc.).
 * Support for combinatorics, geometry and topology, probability and statistics, and many other computer science and mathematics related.
+* Symbolical computing.
 * Embedded plotter for functions.
 * Embedded algorithms.
   * Simplex algorithm.

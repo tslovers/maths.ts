@@ -56,7 +56,7 @@ At this time it is not available on a CDN. So in order to use it in browser it i
       git clone https://github.com/IpiVasquez/maths.ts.git
       cd maths.ts
       npm install
-      npm run grunt
+      npm run gulp
 
 These lines will create a file on maths.ts/bundle/ which will contain maths.js and maths.min.js, ready to use in your browser.
 

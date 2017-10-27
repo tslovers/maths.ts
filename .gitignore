@@ -10,3 +10,4 @@ lib/
 # include or not include?
 bundle/
 package-lock.json
+assets

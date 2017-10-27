@@ -15,25 +15,23 @@
  * limitations under the License.
  */
 
-import * as metaheuristics from './metaheuristics';
-import * as structures from './structures';
-import * as arithmetic from './arithmetic';
-import * as discrete from './discrete';
-import * as graph from './graph';
-import * as NP from './NP';
-// import * as plotter from './plotter';
-// import * as util from './utils';
+import Graph from '../structures/Graph';
+import Vertex from '../structures/Vertex';
+import Edge from '../structures/Edge';
+
+// Search algorithms
+export * from './bfs';
+export * from './dfs';
+export * from './idfs';
+export * from './ucs';
+export * from './aStar';
+export * from './greedy';
 
 export {
-    arithmetic,
-    discrete,
-    graph,
-    metaheuristics,
-    NP,
-    // plotter,
-    structures
-    // util
+    Graph,
+    Vertex,
+    Edge
 };
+// TODO: Flow algorithms
 
-export * from './algorithms';
-export * from './core';
+// TODO: Dijkstra, Ford-Ful...

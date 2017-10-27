@@ -16,7 +16,7 @@
  */
 
 import {Graph, Vertex} from '../../src/structures';
-import {aStar, bfs, dfs, greedySearch, idfs, ucs} from '../../src/discrete';
+import {aStar, bfs, dfs, greedySearch, idfs, ucs} from '../../src/graph';
 import {Logger} from '../../src/algorithms';
 import {expect} from 'chai';
 

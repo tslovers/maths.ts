@@ -4,6 +4,6 @@ module.exports = {
     output: {
         path: __dirname,
         filename: 'bundle/maths.js',
-        library: 'mathsts' // maths.ts or just maths?
+        library: 'maths' // maths.ts or just maths?
     }
 };

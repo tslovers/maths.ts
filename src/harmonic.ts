@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import {simulatedAnnealing} from './metaheuristics/simulatedAnnealing';
 import {table} from 'table';
 import * as NP from './NP';
 import * as fs from 'fs';
+import {harmonicSearch} from './metaheuristics/harmonySearch';
 
 let filename = process.env.FILE || './assets/testMatrix';
 let problemName = filename.split('/').pop();
@@ -26,27 +26,9 @@ let problemName = filename.split('/').pop();
 // Number of repetitions for each permutation of parameters
 const reps: number = 30;
 // Possible parameters
-let temperature = [
-    {
-        description: 't0:100|tf:0|d(t)=t-0.1',
-        tf: 0,
-        t0: 100,
-        decrease: (t: number): number => t - 0.1
-    },
-    {
-        description: 't0:100|tf:1|d(t)=t*0.99',
-        tf: 1,
-        t0: 100,
-        decrease: (t: number): number => t * 0.99
-    },
-    {
-        description: 't0:200|tf:0|d(t)=t-0.1',
-        tf: 0,
-        t0: 200,
-        decrease: (t: number): number => t - 0.1
-    }
-];
-let neighborhoodSize = [5, 15, 25];
+let iterations = [500, 1000, 1500];
+let hmConsideringRate = [0.6, 0.7, 0.8];
+let harmonicMemorySize = [10, 30, 50];
 let neighborhoodDiversity = [0.05, 0.1, 0.15];
 
 fs.readFile(filename, 'utf8', (err, data: string) => {
@@ -70,11 +52,11 @@ fs.readFile(filename, 'utf8', (err, data: string) => {
         ['Param', 'tMin', 'tMax', 'tAvg', 'hMin', 'hMax', 'hAvg']
     ];
     let gTime = +new Date();
-    temperature.forEach(t => {
-        neighborhoodDiversity.forEach(nv => {
-            neighborhoodSize.forEach(ns => {
+    neighborhoodDiversity.forEach(nv => {
+        hmConsideringRate.forEach(hmcr => {
+            harmonicMemorySize.forEach(hms => {
                 report.push([
-                    t.description + '|nv:' + nv + '|ns:' + ns,
+                    'nv:' + nv + '|hmcr:' + hmcr + '|hms:' + hms,
                     Infinity,
                     0,
                     0,
@@ -88,7 +70,7 @@ fs.readFile(filename, 'utf8', (err, data: string) => {
                     // To check time later
                     let time = +new Date();
                     // Generate solution
-                    let s = simulatedAnnealing(lop, ns, nv, t.t0, t.tf, t.decrease);
+                    let s = harmonicSearch(lop, hms, hmcr, nv, 1000);
                     let h = lop.solutionValue(s);
                     // Time spent
                     time = +new Date() - time;
@@ -112,15 +94,11 @@ fs.readFile(filename, 'utf8', (err, data: string) => {
     });
     gTime = +new Date() - gTime;
     console.log('Total time: ' + gTime);
-    console.log('Total iterations: ' +
-        (temperature.length * neighborhoodDiversity.length *
-            neighborhoodSize.length * reps) + ' (' + reps + ' for each ' +
-        'parameter combination)');
     console.log(table(report));
 
     let csvData = '';
     report.forEach(r => csvData += r.join(',') + '\n');
-    let reportFile = problemName + '.SAReport.csv';
+    let reportFile = problemName + '.HSReport.csv';
     fs.writeFile(reportFile, csvData, err => {
         if (err)
             console.error('Something occurred while saving the report.');

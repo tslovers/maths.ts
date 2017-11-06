@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author Hector J. Vasquez <ipi.vasquez@gmail.com>
  *
@@ -14,3 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+exports.__esModule = true;
+// Combinatorial
+__export(require("./permute"));
+__export(require("./integers"));

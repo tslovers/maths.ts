@@ -9,6 +9,7 @@
     "prepare": "gulp",
     "build": "gulp",
     "watch": "gulp watch",
+    "coverage-test": "nyc npm test",
     "gulp": "gulp"
   },
   "repository": {
@@ -51,7 +52,7 @@
   "dependencies": {
     "debug": "^3.1.0",
     "jquery": "^3.2.1",
-    "std.ts": "0.0.3",
+    "std.ts": "0.0.6",
     "table": "^4.0.2"
   }
 }

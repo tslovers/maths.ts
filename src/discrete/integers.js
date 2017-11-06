@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author Hector J. Vasquez <ipi.vasquez@gmail.com>
  *
@@ -14,24 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import Graph from '../structures/Graph';
-import Vertex from '../structures/Vertex';
-import Edge from '../structures/Edge';
-
-// Search algorithms
-export * from './bfs';
-export * from './dfs';
-export * from './idfs';
-export * from './ucs';
-export * from './aStar';
-export * from './greedy';
-
-export {
-    Graph,
-    Vertex,
-    Edge
-};
-// TODO: Flow algorithms
-
-// TODO: Dijkstra, Ford-Ful...
+exports.__esModule = true;
+/**
+ * Generates a random integer in the range [lb, up).
+ * @param lb The lower bound.
+ * @param ub The upper bound.
+ * @returns A random integer between lb and ub.
+ */
+function randInt(lb, ub) {
+    return Math.floor(Math.random() * (ub - lb)) + lb;
+}
+exports.randInt = randInt;
+/**
+ * Calculates the factorial of a given number.
+ * @param n The number from which to calculate factorial.
+ * @returns n!
+ */
+function factorial(n) {
+    var a = 1;
+    for (var i = 2; i <= n; i++)
+        a *= i;
+    return a;
+}
+exports.factorial = factorial;

@@ -18,6 +18,7 @@
 export interface NPProblem<T> {
     solutionValue: (s: T) => number;
     generateSolution: () => any;
+    compareSolutions: (a: T, b: T) => boolean;
     generateNeighbors: (s: T, kDiffer?: number, nNeighbors?: number) => T[];
     description?: any;
 }

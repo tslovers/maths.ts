@@ -16,3 +16,4 @@
  */
 
 export * from './simulatedAnnealing';
+export * from './tabooSearch';

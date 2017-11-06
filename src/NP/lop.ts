@@ -34,8 +34,23 @@ export function generateLOP(wij: number[][]): NPProblem<number[]> {
     return {
         solutionValue: solutionValue,
         generateSolution: generateSolution,
-        generateNeighbors: generateNeighbors
+        generateNeighbors: generateNeighbors,
+        compareSolutions: compareSolutions
     };
+
+    /**
+     * Checks if two solutions are equals.
+     * @param a One solution to compare.
+     * @param b The other solution to compare.
+     */
+    function compareSolutions(a: number[], b: number[]): boolean {
+        if (a.length !== b.length)
+            return false;
+        for (let i = 0; i < a.length; i++)
+            if (a[i] !== b[i])
+                return false;
+        return true;
+    }
 
     /**
      * Calculates the value of a given solution adding the weights of the
@@ -73,7 +88,7 @@ export function generateLOP(wij: number[][]): NPProblem<number[]> {
      */
     function generateNeighbors(curSolution: number[],
                                kDiffer: number = 2,
-                               nNeighbors: number): number[][] {
+                               nNeighbors: number = 1): number[][] {
         let permutations: number[][] = [];
 
         if (kDiffer > 0 && kDiffer < 1)

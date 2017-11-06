@@ -12,9 +12,9 @@ let tsProject = ts.createProject('tsconfig.json', {
 gulp.task('default', () => runSeq('ts', 'webpack', 'compress'));
 
 gulp.task('ts', function () {
-    return tsProject.src()
-        .pipe(tsProject())
-        .js.pipe(gulp.dest('lib'));
+    let tsResult = tsProject.src().pipe(tsProject());
+    tsResult.dts.pipe(gulp.dest('lib'));
+    return tsResult.js.pipe(gulp.dest('lib'));
 });
 
 gulp.task('watch', ['ts'], function () {

@@ -64,7 +64,7 @@ export function graphSearch(graph: Graph, source: number, destination: number,
                             inFunction: (i: VertexElement) => any,
                             logger?: Logger): GraphSearchSolution {
     // Initializing list with the source element
-    let list: VertexList = {
+    const list: VertexList = {
         vertexes: [{
             vertex: graph.vertexes[source],
             id: graph.vertexes[source].id,
@@ -115,18 +115,19 @@ enum VertexStatus {
  */
 function gs(list: VertexList, destination: number,
             logger: Logger): GraphSearchSolution {
-    if (logger)
+    if (logger) {
         logger.push({
             name: 'Starting search of ' + destination + ' from ' +
             list.vertexes[0].vertex.id,
             info: {idVertexList: getInfo(list)}
         });
+    }
 
     // Until there is no more elements on list.
     while (list.vertexes.length) {
-        let v = list.next();
+        const v = list.next();
         list.status[v.id] = VertexStatus.VISITED; // Update status for this node
-        if (logger)
+        if (logger) {
             logger.push({
                 name: 'Current node: ' + v.id + (v.id === destination ?
                     ' -> its goal!' : ''),
@@ -135,6 +136,7 @@ function gs(list: VertexList, destination: number,
                     ignoredVertexes: []
                 }
             });
+        }
 
         // Wuu! Found!
         if (v.id === destination) {
@@ -162,12 +164,13 @@ function gs(list: VertexList, destination: number,
             if (list.status[e.destination.id] !== VertexStatus.VISITED) {
                 // Update status
                 list.status[e.destination.id] = VertexStatus.IN_QUEUE;
-                if (logger)
+                if (logger) {
                     logger[logger.length - 1].info
                         .addedVertexes.push(e.destination.id);
+                }
 
                 // Copy trail
-                let trail = v.trail.slice();
+                const trail = v.trail.slice();
                 // Add this as new element on trail
                 trail.push(e.destination.id);
 
@@ -178,13 +181,15 @@ function gs(list: VertexList, destination: number,
                     cost: v.cost + e.weight,
                     depth: v.depth + 1
                 });
-            } else if (logger)
+            } else if (logger) {
                 logger[logger.length - 1].info
                     .ignoredVertexes.push(e.destination.id);
+            }
         });
 
-        if (logger)
+        if (logger) {
             logger[logger.length - 1].info.idVertexList = getInfo(list);
+        }
     }
 
     return {
@@ -201,9 +206,9 @@ function getInfo(list: VertexList): any {
     return list.vertexes.map(i => {
         return {
             id: i.id,
-            trail: i.trail.map(i => i), // Copying it
+            trail: i.trail.map(e => e), // Copying it
             cost: i.cost,
             depth: i.depth
-        }
+        };
     });
 }

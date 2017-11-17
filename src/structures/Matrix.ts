@@ -35,10 +35,11 @@ export default class Matrix {
      * argument (m) is a number.
      */
     constructor(m: ValidNumber[][] | Matrix | number = 1, n: number = 1) {
-        if (typeof m === 'number')
+        if (typeof m === 'number') {
             this.mxnConstructor(m, n);
-        else
+        } else {
             this.matrixConstructor(m);
+        }
     }
 
     /**
@@ -47,15 +48,18 @@ export default class Matrix {
      * @return The result of this + m.
      */
     public add(m: Matrix): Matrix {
-        if (m.M !== this.M || m.N !== this.N)
+        if (m.M !== this.M || m.N !== this.N) {
             throw new Error('The sizes of the matrix does not match to' +
                 ' execute addition between them.');
+        }
 
-        let result = new Matrix(this.M, this.N);
+        const result = new Matrix(this.M, this.N);
 
-        for (let i = 0; i < this.M; i++)
-            for (let j = 0; j < this.N; j++)
+        for (let i = 0; i < this.M; i++) {
+            for (let j = 0; j < this.N; j++) {
                 result.matrix[i][j] = this.matrix[i][j].add(m.matrix[i][j]);
+            }
+        }
 
         return result;
     }
@@ -66,18 +70,21 @@ export default class Matrix {
      * @return The result of this * m.
      */
     public multiply(m: Matrix): Matrix {
-        if (this.N !== m.M)
+        if (this.N !== m.M) {
             throw new Error('The sizes of the matrix does not match to' +
                 ' execute multiplication between them.');
-        let result: Matrix = new Matrix(this.M, m.N);
+        }
+        const result: Matrix = new Matrix(this.M, m.N);
 
-        for (let i = 0; i < result.M; i++)
+        for (let i = 0; i < result.M; i++) {
             for (let j = 0; j < result.N; j++) {
                 result.matrix[i][j] = new Node(0);
-                for (let k = 0; k < this.N; k++)
+                for (let k = 0; k < this.N; k++) {
                     result.matrix[i][j]
                         .addHere(this.matrix[i][k].multiply(m.matrix[k][j]));
+                }
             }
+        }
 
         return result;
     }
@@ -92,8 +99,9 @@ export default class Matrix {
 
         for (let i = 0; i < m; i++) {
             this.matrix.push([]);
-            for (let j = 0; j < n; j++)
+            for (let j = 0; j < n; j++) {
                 this.matrix[i].push(new Node());
+            }
         }
     }
 
@@ -103,8 +111,9 @@ export default class Matrix {
      * dimensional array of numbers, strings or expressions.
      */
     private matrixConstructor(matrix: ValidNumber[][] | Matrix): void {
-        if (matrix instanceof Matrix)
+        if (matrix instanceof Matrix) {
             matrix = matrix.matrix.map(row => row.map(i => i.clone()));
+        }
 
         this.matrix = matrix.map(row => row.map(Node.newNode));
     }
@@ -119,13 +128,15 @@ export default class Matrix {
     public pivoting(x: number, y: number): void {
         let aux: Node;
 
-        for (let i = 0; i < this.matrix.length; i++)
+        for (let i = 0; i < this.matrix.length; i++) {
             if (i !== y) {
                 aux = this.matrix[i][x].clone();
-                for (let j = 0; j < this.matrix[i].length; j++)
+                for (let j = 0; j < this.matrix[i].length; j++) {
                     this.matrix[i][j]
                         .subtractHere(this.matrix[y][j].multiply(aux));
+                }
             }
+        }
     }
 
     /**
@@ -142,12 +153,13 @@ export default class Matrix {
      * @throws Error if there is no window with a document.
      */
     public toHTMLElement(): HTMLElement {
-        let $table: JQuery = $('<table>');
+        const $table: JQuery = $('<table>');
 
         for (let i = 0; i < this.matrix.length; i++) {
-            let $tr: JQuery = $('<tr>').appendTo($table);
-            for (let j = 0; j < this.matrix[i].length; j++)
+            const $tr: JQuery = $('<tr>').appendTo($table);
+            for (let j = 0; j < this.matrix[i].length; j++) {
                 $tr.append($('<td>', {html: this.matrix[i][j] + ''}));
+            }
         }
 
         return $table[0];
@@ -220,11 +232,13 @@ export default class Matrix {
      * @return The transpose of this matrix.
      */
     get transpose(): Matrix {
-        let mt = new Matrix(this.N, this.M);
+        const mt = new Matrix(this.N, this.M);
 
-        for (let i = 0; i < mt.M; i++)
-            for (let j = 0; j < mt.N; j++)
+        for (let i = 0; i < mt.M; i++) {
+            for (let j = 0; j < mt.N; j++) {
                 mt.matrix[i][j] = this.matrix[j][i].clone();
+            }
+        }
 
         return mt;
     }
@@ -234,20 +248,24 @@ export default class Matrix {
      * @return The adjucate matrix of this.
      */
     get adjucate(): Matrix {
-        if (!this.isSquare)
+        if (!this.isSquare) {
             throw new Error('Only a square matrix has adjucate');
+        }
 
-        let adj = new Matrix(this.M, this.N);
-        for (let i = 0; i < adj.M; i++)
-            for (let j = 0; j < adj.N; j++)
-                if ((i + j) & 1)
+        const adj = new Matrix(this.M, this.N);
+        for (let i = 0; i < adj.M; i++) {
+            for (let j = 0; j < adj.N; j++) {
+                if ((i + j) & 1) {
                     adj.matrix[i][j] = calcDeterminant(
                         subMatrix(this.matrix, j, i)
                     ).negate();
-                else
+                } else {
                     adj.matrix[i][j] = calcDeterminant(
                         subMatrix(this.matrix, j, i)
                     );
+                }
+            }
+        }
 
         return adj;
     }
@@ -257,14 +275,17 @@ export default class Matrix {
      * @return This matrix inverse.
      */
     get inverse(): Matrix {
-        if (!this.isSquare)
+        if (!this.isSquare) {
             throw new Error('Only a square matrix has inverse');
+        }
 
-        let inv = this.adjucate;
-        let det = this.determinant;
-        for (let row of inv.matrix)
-            for (let element of row)
+        const inv = this.adjucate;
+        const det = this.determinant;
+        for (const row of inv.matrix) {
+            for (const element of row) {
                 element.divideHere(det);
+            }
+        }
 
         return inv;
     }
@@ -273,9 +294,10 @@ export default class Matrix {
      * Calculates the determinant of this Matrix recursively.
      */
     get determinant(): Node {
-        if (!this.isSquare)
+        if (!this.isSquare) {
             throw new Error('Determinant can only be calculated on a square ' +
                 ' matrix');
+        }
         return calcDeterminant(this.matrix);
     }
 }
@@ -288,21 +310,24 @@ export default class Matrix {
  * @return The determinant of m.
  */
 function calcDeterminant(m: Node[][]): Node {
-    if (m.length === 2)
+    if (m.length === 2) {
         return m[0][0].multiply(m[1][1]).subtract(m[0][1].multiply(m[1][0]));
-    else if (m.length === 1)
+    } else if (m.length === 1) {
         return m[0][0].clone();
+    }
 
-    let det = new Node(0);
-    for (let i = 0; i < m.length; i++)
-        if ((i & 1) === 0)
+    const det = new Node(0);
+    for (let i = 0; i < m.length; i++) {
+        if ((i & 1) === 0) {
             det.addHere(m[0][i].multiply(
                 calcDeterminant(subMatrix(m, 0, i))
             ));
-        else
+        } else {
             det.subtractHere(m[0][i].multiply(
                 calcDeterminant(subMatrix(m, 0, i))
             ));
+        }
+    }
     return det;
 }
 
@@ -315,10 +340,12 @@ function calcDeterminant(m: Node[][]): Node {
  */
 function subMatrix(m: Node[][], y: number, x: number): Node[][] {
     // TODO
-    let sm: Node[][] = [];
-    for (let i = 0; i < m.length; i++)
-        if (i !== y)
+    const sm: Node[][] = [];
+    for (let i = 0; i < m.length; i++) {
+        if (i !== y) {
             sm.push(m[i].slice(0, x).concat(m[i].slice(x + 1, m.length)));
+        }
+    }
 
     return sm;
 }

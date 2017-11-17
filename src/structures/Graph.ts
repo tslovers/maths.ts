@@ -27,7 +27,6 @@ export type weightFunc = (s: Vertex, d: Vertex) => number;
 export default class Graph {
     private _vertexes: Vertex[];
     private _heuristic: (s: Vertex, d: Vertex) => number;
-    private directed: boolean;
 
     /**
      * Builds a graph with or without vertex.
@@ -36,12 +35,13 @@ export default class Graph {
      * @param directed Indicates if the graph is going to be a directed
      * graph or not.
      */
-    constructor(nVertexes?: number, directed: boolean = false) {
+    constructor(nVertexes?: number, private directed: boolean = false) {
         // TODO: There may be a better way to built a graph, I think.
         this._vertexes = [];
         this.directed = directed;
-        for (let i = 0; i < nVertexes; i++)
+        for (let i = 0; i < nVertexes; i++) {
             this.addVertex();
+        }
     }
 
     /**
@@ -65,10 +65,11 @@ export default class Graph {
         this.vertexes[from].addEdge(
             new Edge(this.vertexes[from], this.vertexes[to], weight, info)
         );
-        if (!this.directed)
+        if (!this.directed) {
             this.vertexes[to].addEdge(
                 new Edge(this.vertexes[to], this.vertexes[from], weight, info)
             );
+        }
     }
 
     /**
@@ -80,8 +81,9 @@ export default class Graph {
      * defined on this graph.
      */
     public heuristicValue(s: number, d: number): number {
-        if (this._heuristic)
+        if (this._heuristic) {
             return this._heuristic(this.vertexes[s], this.vertexes[d]);
+        }
         return 0;
     }
 
@@ -106,7 +108,7 @@ export default class Graph {
      * @return The edges of this graph.
      */
     get edges(): Edge[] {
-        let es: Edge[] = [];
+        const es: Edge[] = [];
         this.vertexes.forEach(
             (v) => v.edges.forEach((e) => es.push(e))
         );
@@ -117,8 +119,9 @@ export default class Graph {
      * Prints this graph vertex and adjacency list.
      */
     public toString(): string {
-        if (this._vertexes.length <= 0)
+        if (this._vertexes.length <= 0) {
             return 'Empty graph';
+        }
         return 'Graph:\n\t' + this.vertexes.join('\n\t');
     }
 }

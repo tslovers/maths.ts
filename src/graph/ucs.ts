@@ -49,8 +49,10 @@ function shift(): VertexElement {
  */
 function push(e: VertexElement): void {
     let i;
-    for (i = 0; i < this.vertexes.length; i++)
-        if (this.vertexes[i].cost > e.cost)
+    for (i = 0; i < this.vertexes.length; i++) {
+        if (this.vertexes[i].cost > e.cost) {
             break;
+        }
+    }
     this.vertexes.splice(i, 0, e);
 }

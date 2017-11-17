@@ -20,8 +20,8 @@ import {aStar, bfs, dfs, greedySearch, idfs, ucs} from '../../src/graph';
 import {Logger} from '../../src/algorithms';
 import {expect} from 'chai';
 
-let SLACK: number = 0.0001;
-let g: Graph = new Graph();
+const SLACK = 0.0001;
+let g = new Graph();
 
 describe('structures::Graph', () => {
     g = new Graph(10);
@@ -44,7 +44,7 @@ describe('structures::Graph', () => {
 
 describe('graph::bfs', () => {
     it('Reachable element', () => {
-        let logger: any = [];
+        const logger: any = [];
         let solution = bfs(g, 0, 5);
         expect(solution.reachable).to.equals(true);
         solution = bfs(g, 2, 5, logger);
@@ -75,7 +75,7 @@ describe('graph::dfs', () => {
 
 describe('graph::idfs', () => {
     it('Reachable element', () => {
-        let logger: Logger = [];
+        const logger: Logger = [];
         let solution = idfs(g, 0, 5, logger);
         expect(solution.reachable).to.equals(true);
         solution = idfs(g, 0, 5);
@@ -93,8 +93,8 @@ describe('graph::idfs', () => {
 
 describe('graph::ucs', () => {
     it('Reachable element', () => {
-        let logger: Logger = [];
-        let solution = ucs(g, 0, 5, logger);
+        const logger: Logger = [];
+        const solution = ucs(g, 0, 5, logger);
         expect(ucs(g, 0, 5).reachable).to.equals(true);
         expect(solution.reachable).to.equals(true);
         expect(solution.cost).to.equals(35);
@@ -113,7 +113,7 @@ g.setHeuristic((s: Vertex, d: Vertex) => Math.abs(d.id - s.id));
 
 describe('graph::greedy', () => {
     it('Reachable element', () => {
-        let logger: Logger = [];
+        const logger: Logger = [];
         expect(greedySearch(g, 0, 8, logger).reachable)
             .to.equals(true);
         expect(greedySearch(g, 2, 7).reachable).to.equals(true);
@@ -128,8 +128,8 @@ describe('graph::greedy', () => {
 
 describe('graph::aStar', () => {
     it('Reachable element', () => {
-        let logger: Logger = [];
-        let solution = aStar(g, 5, 0, logger);
+        const logger: Logger = [];
+        const solution = aStar(g, 5, 0, logger);
         expect(aStar(g, 0, 5, logger).reachable)
             .to.equals(true);
         expect(logger.pop().info.cost).to.equals(35);

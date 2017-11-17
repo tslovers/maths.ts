@@ -19,7 +19,7 @@ import {expect} from 'chai';
 import BitSet from '../../src/structures/BitSet';
 
 describe('structures::BitSet', () => {
-    let n = new BitSet(96, new Uint32Array([4, 4, 4]));
+    const n = new BitSet(96, new Uint32Array([4, 4, 4]));
 
     it('Build', () => {
         expect(n.size).to.equals(96);

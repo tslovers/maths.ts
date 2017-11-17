@@ -66,29 +66,99 @@ export type ValidNumber = number | string | Node;
  * expression must be extended through Node internally.
  */
 export default class Node {
+    // The operators, constants and functions accepted by Node instances
+    public static scope: any = scope;
     // The children of this
     public children: Node[] = [];
     // The exponent for this
     public exponent: Node | number = 1;
-    // The parent of this node, when parent == undefined, this is the root
-    public parent: Node;
     // Represents the sign of this expression
-    private _positive: boolean = true;
+    private _positive = true;
     // Represents the type of the node
     public type: NodeType = NodeType.Constant;
     // The value of this (1, 2, 'x', '+', 'sin', etc...)
     public value: number | string = NaN;
-    // The operators, constants and functions accepted by Node instances
-    public static scope: any = scope;
+
+    /**
+     * Creates a new Node from the given expression.
+     * @param exp The expression from where to create the node.
+     * @return A new node representing the expression.
+     */
+    static newNode(exp?: ValidNumber): Node {
+        return new Node(exp);
+    }
+
+    /**
+     * Returns a new Node representing the addition of a plus b.
+     * @param a A number to add.
+     * @param b A number to add.
+     * @return new Node(a + b).
+     */
+    static add(a: ValidNumber, b: ValidNumber): Node {
+        if (a instanceof Node) {
+            return a.add(b);
+        }
+        if (b instanceof Node) {
+            return b.add(a);
+        }
+        return new Node(a).add(b);
+    }
+
+    /**
+     * Returns a new Node representing the multiplication of a times b.
+     * @param a A number to multiply.
+     * @param b A number to multiply.
+     * @return new Node(a * b).
+     */
+    static multiply(a: ValidNumber, b: ValidNumber): Node {
+        if (a instanceof Node) {
+            return a.multiply(b);
+        }
+        if (b instanceof Node) {
+            return b.multiply(a);
+        }
+        return new Node(a).multiply(b);
+    }
+
+    /**
+     * Adds a constant to the scope.
+     * @param c The constant to be added.
+     * @param v The value the constant will get.
+     */
+    static setConstant(c: string, v: number) {
+
+    }
+
+    /**
+     * Access the operators in Node's scope.
+     * @return The operators in the scope.
+     */
+    static get operators(): any {
+        return Node.scope.operators;
+    }
+
+    /**
+     * Access the functions in Node's scope.
+     * @return The functions in the scope.
+     */
+    static get functions(): any {
+        return Node.scope.functions;
+    }
+
+    /**
+     * Access the constants in Node's scope.
+     * @return The constants in the scope.
+     */
+    static get constants(): any {
+        return Node.scope.constants;
+    }
 
     /**
      * Builds the tree for expression.
      * @param exp The expression to be represented with this.
      * @param parent The parent for this Node.
      */
-    constructor(exp?: ValidNumber, parent?: Node) {
-        this.parent = parent;
-
+    constructor(exp?: ValidNumber, public parent?: Node) {
         if (isNumber(exp)) {
             // Assign a value and a type to this
             this.value = Number(exp);
@@ -103,8 +173,9 @@ export default class Node {
                 exp.exponent : new Node(exp.exponent);
             this._positive = exp._positive;
             // This will recursively build each child
-            for (let child of exp.children)
+            for (const child of exp.children) {
                 this.children.push(new Node(child));
+            }
         } else if (typeof exp === 'string') {
             exp = formatString(exp);
             let pieces: string[] = breakPieces(exp);
@@ -112,8 +183,9 @@ export default class Node {
             while (pieces.length === 1) {
                 exp = pieces[0];
                 pieces = breakPieces(exp);
-                if (pieces[0] === exp)
+                if (pieces[0] === exp) {
                     break;
+                }
             }
             // Build this tree from the pieces obtained
             buildTree(this, pieces);
@@ -127,33 +199,35 @@ export default class Node {
      * global scope or sent through the scope param in order to interpret
      * the variable in the expression, if a variable has no number value in
      * scope then the value returned will be undefined.
-     * @param scope The scope in which some variables inside this will be
+     * @param lScope The scope in which some variables inside this will be
      * evaluated.
      * @return The value for this according to the scope provided. In the
      * event that a variable is missed in the scope it will return undefined.
      */
-    public getNumberValue(scope?: any): number {
+    public getNumberValue(lScope?: any): number {
         let value;
 
-        if (this.type === NodeType.Constant && typeof this.value === 'number')
+        if (this.type === NodeType.Constant && typeof this.value === 'number') {
             value = this.value;
-        else if (this.type === NodeType.Operator)
+        } else if (this.type === NodeType.Operator) {
             value = Node.operators[this.value]
-                .fn(this.children[0], this.children[1], scope);
-        else if (this.type === NodeType.Function)
-            value = Node.functions[this.value].fn(this.children[0], scope);
-        else
+                .fn(this.children[0], this.children[1], lScope);
+        } else if (this.type === NodeType.Function) {
+            value = Node.functions[this.value].fn(this.children[0], lScope);
+        } else {
             try {
-                value = scope[this.value];
+                value = lScope[this.value];
             } catch (Error) {
                 value = Node.constants[this.value];
             }
+        }
 
         if (this.exponent !== 1) {
-            if (typeof this.exponent === 'number')
+            if (typeof this.exponent === 'number') {
                 value = Math.pow(value, this.exponent);
-            else
-                value = Math.pow(value, this.exponent.getNumberValue(scope));
+            } else {
+                value = Math.pow(value, this.exponent.getNumberValue(lScope));
+            }
         }
 
         return this._positive ? value : -value;
@@ -165,8 +239,8 @@ export default class Node {
      * @return A new Node with the value of this plus s.
      */
     public add(s: ValidNumber): Node {
-        let result: Node = new Node();
-        let op: Node = new Node(s); // Operating
+        const result: Node = new Node();
+        const op: Node = new Node(s); // Operating
         result.type = NodeType.Operator;
         result.value = '+';
 
@@ -207,8 +281,8 @@ export default class Node {
      * @return A new Node with the value of this minus s.
      */
     public subtract(s: ValidNumber): Node {
-        let result: Node = new Node();
-        let op: Node = new Node(s); // Operating
+        const result: Node = new Node();
+        const op: Node = new Node(s); // Operating
         result.type = NodeType.Operator;
         result.value = '-';
 
@@ -249,8 +323,8 @@ export default class Node {
      * @return A new Node with the value of this times s.
      */
     public multiply(s: ValidNumber): Node {
-        let result: Node = new Node();
-        let op: Node = new Node(s); // Operating
+        const result: Node = new Node();
+        const op: Node = new Node(s); // Operating
         result.type = NodeType.Operator;
         result.value = '*';
 
@@ -288,8 +362,8 @@ export default class Node {
      * @return A new Node with the value of this between s.
      */
     public divide(s: ValidNumber): Node {
-        let result: Node = new Node();
-        let op: Node = new Node(s); // Operating
+        const result: Node = new Node();
+        const op: Node = new Node(s); // Operating
         result.type = NodeType.Operator;
         result.value = '/';
 
@@ -325,7 +399,7 @@ export default class Node {
      * @return A new Node with the value of this pow s.
      */
     public pow(s: ValidNumber): Node {
-        let n = new Node(this);
+        const n = new Node(this);
         n.powHere(s);
         n.simplify();
         return n;
@@ -336,7 +410,7 @@ export default class Node {
      * @return A negation of this.
      */
     public negate(): Node {
-        let n = this.clone();
+        const n = this.clone();
         n.negateHere();
         return n;
     }
@@ -382,18 +456,23 @@ export default class Node {
      * @param s The expression to operate with.
      * @return A new Node with the value of this pow s.
      */
-    public powHere(s: ValidNumber): void {
-        if (typeof this.exponent === 'number')
+    public powHere(s: ValidNumber): Node {
+        if (typeof this.exponent === 'number') {
             this.exponent = new Node(this.exponent + '*(' + s + ')');
-        else
+        } else {
             this.exponent.multiplyHere(s);
+        }
+
+        return this;
     }
 
     /**
      * Changes this node's sign.
      */
-    public negateHere(): void {
+    public negateHere(): Node {
         this.positive = !this.positive;
+
+        return this;
     }
 
     /**
@@ -403,9 +482,10 @@ export default class Node {
      * @return this {operator} n.
      */
     public compare(n: Node | number, operator: string = '=') {
-        let t = this.numberValue;
-        if (n instanceof Node)
+        const t = this.numberValue;
+        if (n instanceof Node) {
             n = n.numberValue;
+        }
         switch (operator) {
             case '>':
                 return t > n;
@@ -428,18 +508,22 @@ export default class Node {
      */
     public toString(): string {
         let s: string;
-        if (this.type === NodeType.Function)
+        if (this.type === NodeType.Function) {
             s = this.value + '(' + this.children.join(', ') + ')';
-        else if (this.type === NodeType.Operator)
+        } else if (this.type === NodeType.Operator) {
             s = this.printChild(this.children[0]) + this.value +
                 this.printChild(this.children[1]);
-        else
+        } else {
             s = this.value + ''; // In case is a variable or a constant
+        }
 
-        if (this._positive)
+        if (this._positive) {
             return s;
-        if (this.type === NodeType.Operator)
+        }
+        if (this.type === NodeType.Operator) {
             return '-(' + s + ')';
+        }
+
         return '-' + s;
     }
 
@@ -466,9 +550,10 @@ export default class Node {
      */
     public simplify(): void {
         // TODO: Exponents here?
-        for (let child of this.children)
+        for (const child of this.children) {
             child.simplify();
-        let n = this.numberValue;
+        }
+        const n = this.numberValue;
         // The most simple simplification
         if (this.type !== NodeType.Constant && !isNaN(n) &&
             n === Math.floor(n)) {
@@ -476,8 +561,8 @@ export default class Node {
             return;
         }
 
-        if (this.type === NodeType.Operator)
-        // TODO: There is still many work to do in simplification of nodes
+        if (this.type === NodeType.Operator) {
+            // TODO: There is still many work to do in simplification of nodes
             switch (this.value) {
                 case '+':
                     this.simplifyAddition();
@@ -494,6 +579,7 @@ export default class Node {
                 case '^':
                     break;
             }
+        }
     }
 
     /**
@@ -504,22 +590,23 @@ export default class Node {
      * integer number.
      */
     public rationalize(): void {
-        let wasNegative = this.value < 0;
+        const wasNegative = this.value < 0;
         // Checks if there is no need to process a constant
         if (typeof this.value !== 'number'
-            || Math.floor(this.value) === this.value)
+            || Math.floor(this.value) === this.value) {
             return;
+        }
         // Stringify value
-        let n = '' + (this.value < 0 ? -this.value : this.value);
+        const n = '' + (this.value < 0 ? -this.value : this.value);
         // Check how many digits does this.value have
-        let nDigits = n.length - 1;
+        const nDigits = n.length - 1;
         // Checks how many of those digits are at the left of the decimal point
-        let nIntDigits = (Math.round(this.value) + '').length;
+        const nIntDigits = (Math.round(this.value) + '').length;
         // Based on nIntDigits it creates a denominator for this.value
-        let numerator = Number(n.replace('.', ''));
-        let denominator = Math.pow(10, nDigits - nIntDigits);
+        const numerator = Number(n.replace('.', ''));
+        const denominator = Math.pow(10, nDigits - nIntDigits);
         // Simplify before create fraction
-        let common = gcd(Number(numerator), denominator);
+        const common = gcd(Number(numerator), denominator);
         // Build this as a fraction
         this.type = NodeType.Operator;
         this.value = '/';
@@ -585,10 +672,11 @@ export default class Node {
      * Sets the sign of this.
      */
     set positive(value: boolean) {
-        if (this.type === NodeType.Constant && this.positive !== value)
+        if (this.type === NodeType.Constant && this.positive !== value) {
             this.value = -this.value;
-        else
+        } else {
             this._positive = value;
+        }
     }
 
     /**
@@ -605,13 +693,15 @@ export default class Node {
      * @return The string as how n should be printed.
      */
     private printChild(n: Node): string {
-        let nOp = Node.operators[n.value];
-        if (nOp === undefined)
+        const nOp = Node.operators[n.value];
+        if (nOp === undefined) {
             return n.toString();
+        }
 
-        let thisOp = Node.operators[this.value];
-        if (nOp.priority >= thisOp.priority && n.value !== '/')
+        const thisOp = Node.operators[this.value];
+        if (nOp.priority >= thisOp.priority && n.value !== '/') {
             return n.toString();
+        }
 
         return '(' + n.toString() + ')';
     }
@@ -621,17 +711,18 @@ export default class Node {
      */
     private simplifyDivision(): void {
         if (Math.abs(this.children[1].numberValue) === 1) {
-            let aux = this.children[1].numberValue === -1;
+            const aux = this.children[1].numberValue === -1;
             this.update(this.children[0]);
-            if (aux)
+            if (aux) {
                 this.negateHere();
+            }
             return;
         }
-        let num = this.children[0].numberValue;
-        let den = this.children[1].numberValue;
+        const num = this.children[0].numberValue;
+        const den = this.children[1].numberValue;
         if (num !== undefined && den !== undefined &&
             Math.floor(num) === num && Math.floor(den) === den) {
-            let common = gcd(num, den);
+            const common = gcd(num, den);
             this.children[0].value = num / common;
             this.children[1].value = den / common;
         }
@@ -646,15 +737,17 @@ export default class Node {
         if (Math.abs(this.children[0].numberValue) === 1) {
             aux = this.children[0].numberValue === -1;
             this.update(this.children[1]);
-            if (aux)
+            if (aux) {
                 this.negateHere();
+            }
             return;
         }
         if (Math.abs(this.children[1].numberValue) === 1) {
             aux = this.children[1].numberValue === -1;
             this.update(this.children[0]);
-            if (aux)
+            if (aux) {
                 this.negateHere();
+            }
             return;
         }
     }
@@ -663,10 +756,12 @@ export default class Node {
      * Simplifies this when it is a division.
      */
     private simplifyAddition(): void {
-        if (this.children[0].numberValue === 0)
+        if (this.children[0].numberValue === 0) {
             this.update(this.children[1]);
-        if (this.children[1].numberValue === 0)
+        }
+        if (this.children[1].numberValue === 0) {
             this.update(this.children[0]);
+        }
     }
 
     /**
@@ -677,78 +772,9 @@ export default class Node {
             this.update(this.children[1]);
             this.negateHere();
         }
-        if (this.children[1].numberValue === 0)
+        if (this.children[1].numberValue === 0) {
             this.update(this.children[0]);
-    }
-
-    /**
-     * Creates a new Node from the given expression.
-     * @param exp The expression from where to create the node.
-     * @return A new node representing the expression.
-     */
-    static newNode(exp?: ValidNumber): Node {
-        return new Node(exp);
-    }
-
-    /**
-     * Returns a new Node representing the addition of a plus b.
-     * @param a A number to add.
-     * @param b A number to add.
-     * @return new Node(a + b).
-     */
-    static add(a: ValidNumber, b: ValidNumber): Node {
-        if (a instanceof Node)
-            return a.add(b);
-        if (b instanceof Node)
-            return b.add(a);
-        return new Node(a).add(b);
-    }
-
-    /**
-     * Returns a new Node representing the multiplication of a times b.
-     * @param a A number to multiply.
-     * @param b A number to multiply.
-     * @return new Node(a * b).
-     */
-    static multiply(a: ValidNumber, b: ValidNumber): Node {
-        if (a instanceof Node)
-            return a.multiply(b);
-        if (b instanceof Node)
-            return b.multiply(a);
-        return new Node(a).multiply(b);
-    }
-
-    /**
-     * Adds a constant to the scope.
-     * @param c The constant to be added.
-     * @param v The value the constant will get.
-     */
-    static setConstant(c: string, v: number) {
-
-    }
-
-    /**
-     * Access the operators in Node's scope.
-     * @return The operators in the scope.
-     */
-    static get operators(): any {
-        return Node.scope.operators;
-    }
-
-    /**
-     * Access the functions in Node's scope.
-     * @return The functions in the scope.
-     */
-    static get functions(): any {
-        return Node.scope.functions;
-    }
-
-    /**
-     * Access the constants in Node's scope.
-     * @return The constants in the scope.
-     */
-    static get constants(): any {
-        return Node.scope.constants;
+        }
     }
 }
 
@@ -771,13 +797,15 @@ export enum NodeType {
  */
 function buildTree(node: Node, pieces: string[]) {
     let flag;
-    if (pieces.length === 2 && pieces[0] === '-')
+    if (pieces.length === 2 && pieces[0] === '-') {
         flag = pieces.shift();
+    }
     // Checking the expression actually is atomic
-    if (pieces.length === 1)
+    if (pieces.length === 1) {
         pieces = breakPieces(pieces[0]);
+    }
     // In case is atomic
-    if (pieces.length === 1)
+    if (pieces.length === 1) {
         switch (node.type = detectNodeType(pieces[0])) {
             case NodeType.Variable:
                 node.value = pieces[0].match(symbolRegex)[0];
@@ -795,10 +823,9 @@ function buildTree(node: Node, pieces: string[]) {
             default:
                 throw new InputError('Something unexpected happened.');
         }
-    else {
-        let nodes: any = [];
-        let priorI: number = -1;
-        for (let i = 1; i < pieces.length; i++)
+    } else {
+        let priorI = -1;
+        for (let i = 1; i < pieces.length; i++) {
             // This if checks if pieces[i] is an operator and checks that
             // pieces[i - 1] is not an operator. If its and operator it
             // probably is -. Then checks the priority of the operator so it
@@ -807,8 +834,10 @@ function buildTree(node: Node, pieces: string[]) {
             if (Node.operators[pieces[i]] !== undefined &&
                 Node.operators[pieces[i - 1]] === undefined &&
                 (priorI < 0 || Node.operators[pieces[i]].priority <
-                    Node.operators[pieces[priorI]].priority))
+                    Node.operators[pieces[priorI]].priority)) {
                 priorI = i;
+            }
+        }
         // TODO: FACTORIAL! ---> ! operator exception
         // TODO: Exponents in exponent meant space!
         if ((node.value = pieces[priorI]) !== '^^') {
@@ -817,13 +846,12 @@ function buildTree(node: Node, pieces: string[]) {
             buildTree(node.children[0], pieces.slice(0, priorI));
             node.children.push(new Node(undefined, node));
             buildTree(node.children[1], pieces.slice(priorI + 1));
-        } else {
-
         }
     }
 
-    if (flag === '-')
+    if (flag === '-') {
         node.positive = false;
+    }
 }
 
 /**
@@ -833,12 +861,14 @@ function buildTree(node: Node, pieces: string[]) {
  */
 function detectNodeType(exp: string): NodeType {
     let s;
-    if (numberRegex.test(exp) && exp.match(numberRegex)[0] === exp)
+    if (numberRegex.test(exp) && exp.match(numberRegex)[0] === exp) {
         return NodeType.Constant;
+    }
 
     if (s = exp.match(symbolRegex)[0]) {
-        if (exp.indexOf(s) === 0 && exp[s.length] === '(')
+        if (exp.indexOf(s) === 0 && exp[s.length] === '(') {
             return NodeType.Function;
+        }
         return NodeType.Variable;
     }
 
@@ -852,7 +882,7 @@ function detectNodeType(exp: string): NodeType {
  * @return The splitted expression.
  */
 function breakPieces(exp: string): string[] {
-    let parts: string[] = [];
+    const parts: string[] = [];
     let part: string;
 
     for (let i = 0; i < exp.length; i++) {
@@ -866,19 +896,21 @@ function breakPieces(exp: string): string[] {
             i += part.length - 1;
         } else if (isAlpha(exp[i])) {
             part = exp.substring(i, exp.length).match(symbolRegex)[0];
-            if (exp[i + part.length] === '(')
+            if (exp[i + part.length] === '(') {
                 part += '(' +
                     getBracketExp(exp.substring(i + part.length, exp.length))
                     + ')';
+            }
             parts.push(part);
             i += part.length - 1;
-        } else if (Node.operators[exp[i]] !== undefined)
+        } else if (Node.operators[exp[i]] !== undefined) {
             parts.push(exp[i]);
-        else if (exp[i] === ')')
+        } else if (exp[i] === ')') {
             throw new InputError({
                 message: 'There is an extra closing bracket',
                 input: exp
             });
+        }
     }
 
     return parts;
@@ -890,23 +922,27 @@ function breakPieces(exp: string): string[] {
  * @return The expression inside the first pair of brackets the expression has.
  */
 function getBracketExp(exp: string): string {
-    if (exp[0] !== '(')
+    if (exp[0] !== '(') {
         throw new InputError({
             message: 'The expression does not start with a bracket.',
             input: exp
         });
+    }
 
     let k, i;
-    for (k = i = 1; k !== 0 && i < exp.length; i++)
-        if (exp[i] === ')')
+    for (k = i = 1; k !== 0 && i < exp.length; i++) {
+        if (exp[i] === ')') {
             k--;
-        else if (exp[i] === '(')
+        } else if (exp[i] === '(') {
             k++;
-    if (k !== 0)
+        }
+    }
+    if (k !== 0) {
         throw new InputError({
             message: 'Expression with extra open bracket.',
             input: exp
         });
+    }
 
     return exp.substring(1, i - 1);
 }
@@ -918,7 +954,7 @@ function getBracketExp(exp: string): string {
  */
 function isNumber(n: any): boolean {
     if (typeof n === 'string') {
-        let strictNumberRegex = /^-?(((\d+)(\.\d+)?)|(\.\d+))$/;
+        const strictNumberRegex = /^-?(((\d+)(\.\d+)?)|(\.\d+))$/;
         return typeof n === 'number' || strictNumberRegex.test(n);
     }
 
@@ -969,14 +1005,16 @@ function formatString(exp: string): string {
         .replace(/ *\/ */g, '/')
         .replace(/ *\^ */g, '^');
     // Checks if there are empty expressions on input
-    if (exp.length === 0 || exp.search(/\( *\)/) >= 0)
+    if (exp.length === 0 || exp.search(/\( *\)/) >= 0) {
         throw new InputError('There cannot be empty expressions on input.');
+    }
     // Checks there are no errors on input
-    let errorPattern =
+    const errorPattern =
         /(([*+\/^])([*+\/^])+)|(\(([*+\/^])+)|(([*+\/^])+\))/;
-    if (exp.search(errorPattern) >= 0)
+    if (exp.search(errorPattern) >= 0) {
         throw new Error('There are two operators that does not suppose' +
             ' to be together: ' + exp + '.');
+    }
 
     return exp;
 }

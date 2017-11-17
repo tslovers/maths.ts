@@ -17,7 +17,7 @@
 
 import * as _debug from 'debug';
 
-import {NPProblem} from '../NP/index';
+import {NPProblem} from './';
 
 const debug = _debug('mh::ts');
 
@@ -38,23 +38,24 @@ export function tabooSearch<T>(problem: NPProblem<T>,
                                tlSize: number = 30,
                                iterations: number = 100): T {
     // Generates an initial solution
-    let sol = problem.generateSolution();
-    let tabooList: T[] = [];
+    const sol = problem.generateSolution();
+    const tabooList: T[] = [];
     let bestS = sol;
     debug('Initial sol: ' + bestS);
     let bestVal = problem.solutionValue(bestS);
     for (let i = 0; i < iterations; i++) {
-        let neighbors = problem.generateNeighbors(sol, kDiffer, nNeighbors);
-        let candidates: T[] = [];
+        const neighbors = problem.generateNeighbors(sol, kDiffer, nNeighbors);
+        const candidates: T[] = [];
         neighbors.forEach(n => {
             debug('%s=%d', '' + n, problem.solutionValue(n));
-            if (!isIn(n, tabooList))
+            if (!isIn(n, tabooList)) {
                 candidates.push(n);
+            }
         });
         let bestC: T = candidates[0];
         let bestCVal = 0;
         candidates.forEach(c => {
-            let cVal = problem.solutionValue(c);
+            const cVal = problem.solutionValue(c);
             if (cVal > bestCVal) {
                 bestCVal = cVal;
                 bestC = c;
@@ -66,8 +67,9 @@ export function tabooSearch<T>(problem: NPProblem<T>,
             bestS = bestC;
             bestVal = bestCVal;
             tabooList.unshift(bestC);
-            if (tabooList.length >= tlSize)
+            if (tabooList.length >= tlSize) {
                 tabooList.pop();
+            }
         }
     }
     debug(tabooList);
@@ -75,9 +77,11 @@ export function tabooSearch<T>(problem: NPProblem<T>,
     return bestS;
 
     function isIn(e: T, array: T[]): boolean {
-        for (let i = 0; i < array.length; i++)
-            if (problem.compareSolutions(array[i], e))
+        for (let i = 0; i < array.length; i++) {
+            if (problem.compareSolutions(array[i], e)) {
                 return true;
+            }
+        }
         return false;
     }
 }

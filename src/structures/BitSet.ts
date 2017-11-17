@@ -29,9 +29,9 @@ export default class BitSet {
     // Represents the bit set
     private _buffer: Uint32Array;
     // The number of bits on in this
-    private _numOn: number = 0;
+    private _numOn = 0;
     // The size of the bit set
-    private _size: number = 0;
+    private _size = 0;
 
     /**
      * Builds this with a default array size of 1, that means 32 bits.
@@ -39,10 +39,11 @@ export default class BitSet {
      * @param buffer A buffer previously set if it is required.
      */
     constructor(size: number = 1, buffer?: ArrayBuffer) {
-        if (buffer)
+        if (buffer) {
             this.setFromBuffer(buffer, size);
-        else
+        } else {
             this.size = size;
+        }
     }
 
     /**
@@ -50,7 +51,7 @@ export default class BitSet {
      * @param i The bit to get.
      * @return this[i].
      */
-    public get (i: number): boolean {
+    public get(i: number): boolean {
         return (this._buffer[elementIndex(i)] & (1 << bitPlace(i))) !== 0;
     }
 
@@ -59,18 +60,21 @@ export default class BitSet {
      * @param i The bit to be set.
      * @param value The value for the bit.
      */
-    public set (i: number, value: boolean): void {
+    public set(i: number, value: boolean): void {
         // If this.size is less than the expected, updates size
-        if (value && this.size <= i)
+        if (value && this.size <= i) {
             this.size = (i + 1);
+        }
 
         const existing = this.get(i);
-        if (value === existing)
+        if (value === existing) {
             return;
-        if (value)
+        }
+        if (value) {
             this._buffer[elementIndex(i)] |= 1 << bitPlace(i);
-        else
+        } else {
             this._buffer[elementIndex(i)] &= ~(1 << bitPlace(i));
+        }
         // Updates number of bits on
         this._numOn += value ? 1 : -1;
     }
@@ -82,9 +86,9 @@ export default class BitSet {
     public setAll(value: boolean): void {
         const overhang = this._size % PER_ELEM_BITS;
 
-        if (overhang === 0 || !value)
+        if (overhang === 0 || !value) {
             fill(this._buffer, value ? FULL_ELEM : 0);
-        else { // fill up to overhang, write last elem manually
+        } else { // fill up to overhang, write last elem manually
             fill(this._buffer, FULL_ELEM, this._buffer.length - 1);
             this._buffer[this._buffer.length - 1] = (1 << overhang) - 1;
         }
@@ -149,8 +153,9 @@ export default class BitSet {
      * @param size The new size for this bitset.
      */
     set size(size: number) {
-        if (size === this._size)
+        if (size === this._size) {
             return;
+        }
 
         const oldBuf = this._buffer;
         const newBuf = this._buffer = new Uint32Array(nElementsNeeded(size));
@@ -160,15 +165,18 @@ export default class BitSet {
                 newBuf.set(oldBuf.subarray(0, newBuf.length));
                 // clear bits above the overhang
                 const numOverhang = size % PER_ELEM_BITS;
-                if (numOverhang > 0)
+                if (numOverhang > 0) {
                     newBuf[newBuf.length - 1] &= (1 << numOverhang) - 1;
+                }
 
                 this._numOn = bitsOn(newBuf, size);
-            } else
-            // we grew, no need to recompute num true, just copy
+            } else {
+                // we grew, no need to recompute num true, just copy
                 newBuf.set(oldBuf);
-        } else
+            }
+        } else {
             this._numOn = 0; // fresh array
+        }
     }
 
     /**
@@ -234,11 +242,13 @@ function bitsOn(buf: Uint32Array, size: number): number {
     const numOverhang = size % PER_ELEM_BITS;
     let sum = 0;
 
-    for (let i = 0; i < nElements; i++)
-        if (i === nElements - 1 && numOverhang > 0)
+    for (let i = 0; i < nElements; i++) {
+        if (i === nElements - 1 && numOverhang > 0) {
             sum += popCount(buf[i], numOverhang);
-        else
+        } else {
             sum += popCount(buf[i]);
+        }
+    }
 
     return sum;
 }
@@ -250,8 +260,9 @@ function bitsOn(buf: Uint32Array, size: number): number {
  * @return The number of bits on in anInt.
  */
 function popCount(int: number, startingBit?: number) {
-    if (startingBit !== undefined)
+    if (startingBit !== undefined) {
         int &= (1 << startingBit) - 1;
+    }
     // Some boring constants
     int -= int >> 1 & 0x55555555;
     int = (int & 0x33333333) + (int >> 2 & 0x33333333);

@@ -1,3 +1,20 @@
+/**
+ * @author Hector J. Vasquez <ipi.vasquez@gmail.com>
+ *
+ * @licence
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {ascending, criterion} from '../utils/comparisons';
 import {Logger} from './index';
 
@@ -16,10 +33,11 @@ import {Logger} from './index';
  */
 export function mergeSort<T>(a: T[], compare: criterion = ascending,
                              logger?: Logger): T[] {
-    if (logger !== undefined)
+    if (logger !== undefined) {
         loggedMSort(a, 0, a.length, compare, logger);
-    else
+    } else {
         mSort(a, 0, a.length, compare);
+    }
 
     return a;
 }
@@ -37,7 +55,7 @@ export function mergeSort<T>(a: T[], compare: criterion = ascending,
 function loggedMSort<T>(a: T[], p: number, r: number, compare: criterion,
                         logger: Logger): void {
     if ((r - p) > 1) {
-        let q: number = Math.floor((p + r) / 2);
+        const q: number = Math.floor((p + r) / 2);
 
         // Inform about this recursion opening
         logger.push({
@@ -73,7 +91,7 @@ function mSort<T>(a: T[], p: number, r: number, compare: criterion): void {
     // Ends when there are only 1 elements to evaluate
     if ((r - p) > 1) {
         // Gets the center of the array
-        let q: number = Math.floor((p + r) / 2);
+        const q: number = Math.floor((p + r) / 2);
         // Merge sort the first half of this collection
         mSort(a, p, q, compare);
         // Merge sort the last half of this collection
@@ -96,14 +114,16 @@ function merge<T>(a: T[], p: number, q: number, r: number,
                   compare: criterion): void {
     let i: number;
     let j: number;
-    let l1: T[] = a.slice(p, q); // Copy the first half
-    let l2: T[] = a.slice(q, r); // Copy the last half
+    const l1: T[] = a.slice(p, q); // Copy the first half
+    const l2: T[] = a.slice(q, r); // Copy the last half
 
     i = j = 0;
     // Orders from p to q
-    for (let k = p; k < r; k++)
-        if (compare(l1[i], l2[j]) < 0 && l1.length !== i)
+    for (let k = p; k < r; k++) {
+        if (compare(l1[i], l2[j]) < 0 && l1.length !== i) {
             a[k] = l1[i++];
-        else
+        } else {
             a[k] = l2[j++];
+        }
+    }
 }

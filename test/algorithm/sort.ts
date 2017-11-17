@@ -20,7 +20,8 @@ import * as comparisons from '../../src/utils/comparisons';
 import {expect} from 'chai';
 
 describe('algorithms::mergeSort', () => {
-    let array = [10, 5, 17, 18, 68, 12, 0, -4, 47];
+    const array = [10, 5, 17, 18, 68, 12, 0, -4, 47];
+
     it('Odd size array, ascending', () => {
         expect(comparisons.isAscendingArray(
             algorithms.mergeSort(array, comparisons.ascending)
@@ -60,7 +61,7 @@ describe('algorithms::mergeSort', () => {
 });
 
 describe('algorithms::quickSort', () => {
-    let array = [10, 5, 17, 18, 68, 12, 0, -4, 47];
+    const array = [10, 5, 17, 18, 68, 12, 0, -4, 47];
     it('Odd size array, ascending', () => {
         expect(comparisons.isAscendingArray(
             algorithms.quickSort(array, comparisons.ascending)
@@ -86,4 +87,3 @@ describe('algorithms::quickSort', () => {
         )).to.equals(true);
     });
 });
-

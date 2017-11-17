@@ -24,7 +24,7 @@ import {randInt} from './integers';
  * @returns An array with perms permutations of arr.
  */
 export function permute<T>(arr: T[], perms: number): T[][] {
-    // TODO
+    // TODO function*?
     return [];
 }
 
@@ -37,11 +37,11 @@ export function permute<T>(arr: T[], perms: number): T[][] {
  * @returns An array with perms permutations of arr.
  */
 export function randPermute<T>(arr: T[], perms?: number): T[][] {
-    let permutations: T[][] = [];
+    const permutations: T[][] = [];
 
-    while(permutations.length < perms) {
+    while (permutations.length < perms) {
         let i = 0, j = 0;
-        let perm = arr.slice();
+        const perm = arr.slice();
         while (i === j && arr.length !== 1) {
             i = randInt(0, arr.length);
             j = randInt(0, arr.length);
@@ -59,16 +59,17 @@ export function randPermute<T>(arr: T[], perms?: number): T[][] {
  * @param n The size of the array.
  */
 export function randPermutation(n: number): number[] {
-    let perm: number[] = [];
+    const perm: number[] = [];
 
-    for (let i = 0; i < n; i++)
+    for (let i = 0; i < n; i++) {
         perm.push(i);
+    }
 
     n = n * n;
     for (let i = 0; i < n; i++) {
-        let a = randInt(0, perm.length),
+        const a = randInt(0, perm.length),
             b = randInt(0, perm.length);
-        let aux: number = perm[a];
+        const aux: number = perm[a];
         perm[a] = perm[b];
         perm[b] = aux;
     }

@@ -24,32 +24,20 @@ import Edge from './Edge';
  */
 export default class Vertex {
     /**
-     * This id must be handled internally by the Graph which this vertex
+     * @property id Must be handled internally by the Graph which this vertex
      * belongs to.
      */
-    public id: number;
-    /**
-     * Extra information needed for this vertex such as coordinates, status,
-     * etc. shall be included in here. The intention for name is to be used
-     * as for example, the weight function of an edge or a heuristic in the
-     * graph.
-     * e.g. Having this.name allows to calculate that heuristic as the
-     * euclidean distance if it has the coordinates for this vertex.
-     */
-    public info: any;
     private _edges: Edge[];
-    private _name: string;
 
     /**
      * Builds a vertex with an optional name and optional extra information
      * for it.
-     * @param id The id of this vertex on graph.
-     * @param name The name this is going to get when printing.
+     * @param id The id of this vertex on graph. Must be handled internally
+     * by the Graph which this vertex belongs to.
+     * @param _name The name this is going to get when printing.
      * @param info
      */
-    constructor(id: number, name?: string, info?: any) {
-        this.id = id;
-        this._name = name;
+    constructor(public id: number, private _name?: string, public info?: any) {
         this.info = info;
         this._edges = [];
     }
@@ -59,14 +47,16 @@ export default class Vertex {
      * @param e The new edge from this.
      */
     public addEdge(e: Edge): void {
-        for (let i = 0; i < this._edges.length; i++)
+        for (let i = 0; i < this._edges.length; i++) {
             if (this.edges[i].source.equals(e.source) &&
                 this.edges[i].destination === e.destination) {
                 if (this.edges[i].weight && e.weight &&
-                    this.edges[i].weight > e.weight)
+                    this.edges[i].weight > e.weight) {
                     this.edges[i] = e;
-                return;
+                    return;
+                }
             }
+        }
         this.edges.push(e);
     }
 
@@ -83,8 +73,9 @@ export default class Vertex {
      * @return The name of this vertex.
      */
     get name(): string {
-        if (this._name)
+        if (this._name) {
             return this._name;
+        }
         return this.id + '';
     }
 

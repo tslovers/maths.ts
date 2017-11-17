@@ -33,8 +33,9 @@ export function randInt(lb: number, ub: number): number {
 export function factorial(n: number): number {
     let a = 1;
 
-    for (let i = 2; i <= n; i++)
+    for (let i = 2; i <= n; i++) {
         a *= i;
+    }
 
     return a;
 }

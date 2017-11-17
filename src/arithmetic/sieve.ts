@@ -28,21 +28,25 @@ const LIMIT = 1100401;
  * @param max The last number this algorithm will reach.
  * @return An array with all prime numbers from 0 to max.
  */
-export default function sieveOfEratosthenes(max: number = LIMIT): number[] {
-    let bs = new BitSet(max);
-    let maxPrimeSqrt = Math.round(Math.sqrt(max));
-    let primes = [];
+export function sieveOfEratosthenes(max: number = LIMIT): number[] {
+    const bs = new BitSet(max);
+    const maxPrimeSqrt = Math.round(Math.sqrt(max));
+    const primes = [];
 
-    for (let i = 2; i <= maxPrimeSqrt; i++)
+    for (let i = 2; i <= maxPrimeSqrt; i++) {
         if (!bs.get(i)) {
             primes.push(i);
-            for (let j = 0; j < max; j += i)
+            for (let j = 0; j < max; j += i) {
                 bs.set(j, true);
+            }
         }
+    }
     for (let i = maxPrimeSqrt + ((maxPrimeSqrt & 1) ? 2 : 1);
-         i < max; i += 2)
-        if (!bs.get(i))
+         i < max; i += 2) {
+        if (!bs.get(i)) {
             primes.push(i);
+        }
+    }
 
     return primes;
 }

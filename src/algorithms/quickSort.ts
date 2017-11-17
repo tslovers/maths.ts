@@ -1,3 +1,20 @@
+/**
+ * @author Hector J. Vasquez <ipi.vasquez@gmail.com>
+ *
+ * @licence
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {ascending, criterion} from '../utils/comparisons';
 import {Logger} from './';
 
@@ -17,10 +34,12 @@ import {Logger} from './';
  */
 export function quickSort<T>(a: T[], compare: criterion = ascending,
                              logger?: Logger): T[] {
-    if (logger === undefined)
+    if (logger === undefined) {
         qSort(a, 0, a.length - 1, compare);
-    else
+    } else {
         loggedQSort(a, 0, a.length - 1, compare, logger);
+    }
+
     return a;
 }
 
@@ -39,7 +58,7 @@ function loggedQSort<T>(a: T[], p: number, r: number, compare: criterion,
     if (p < r) {
         let info: string = 'A[' + p + '-' + r + '] split into A';
         let sRep: string = '[' + a.slice(p, r).join(', ') + '] to ';
-        let q: number = partition(a, p, r, compare);
+        const q: number = partition(a, p, r, compare);
         info += '[' + p + '-' + q + '] and [' + (q + 1) + '-' + r + ']';
         sRep += '[' + a.slice(p, q).join(', ') + '] and ' + '[' +
             a.slice(q, r).join(', ') + '] ' + 'Where A[' + q + '] = ' + a[q] +
@@ -64,7 +83,7 @@ function loggedQSort<T>(a: T[], p: number, r: number, compare: criterion,
  */
 function qSort<T>(a: T[], p: number, r: number, compare: criterion): void {
     if (p < r) {
-        let q: number = partition(a, p, r, compare);
+        const q: number = partition(a, p, r, compare);
         qSort(a, p, q - 1, compare);
         qSort(a, q + 1, r, compare);
     }
@@ -82,12 +101,14 @@ function qSort<T>(a: T[], p: number, r: number, compare: criterion): void {
  */
 function partition<T>(a: T[], p: number, r: number,
                       compare: criterion): number {
-    let x: T = a[r];
+    const x: T = a[r];
     let i: number = p - 1;
 
-    for (let j = p; j < r; j++)
-        if (compare(a[j], x) < 0)
+    for (let j = p; j < r; j++) {
+        if (compare(a[j], x) < 0) {
             swapPositions(a, ++i, j);
+        }
+    }
     swapPositions(a, ++i, r);
 
     return i;

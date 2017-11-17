@@ -34,7 +34,7 @@
 
 import * as _debug from 'debug';
 
-import {NPProblem} from '../NP/index';
+import {NPProblem} from './';
 import {randInt} from '../discrete/integers';
 
 const debug = _debug('mh::hs');
@@ -43,8 +43,11 @@ const debug = _debug('mh::hs');
  *
  * @param problem The problem which must have a solution generator, a
  * calculator for the solution and a neighbor generator for each solution.
- * @param hms The harmonic memory size.
- * @param kDiffer The percentage change of each neighbor from the solution.
+ * @param hms Harmonic memory size.
+ * @param hmcr Harmonic memory consideration rate represents the probability
+ * to use the harmonic memory to generate a solution.
+ * @param kDiffer Percentage of change of each neighbor from the solution.
+ * @param maxIt
  * @returns The solution found by this algorithm.
  */
 export function harmonicSearch<T>(problem: NPProblem<T>,
@@ -53,23 +56,26 @@ export function harmonicSearch<T>(problem: NPProblem<T>,
                                   kDiffer: number = 2,
                                   maxIt: number = 500): T {
     // Generates an initial harmonic memory
-    let hMemory: T[] = [];
-    for (let i = 0; i < hms; i++)
+    const hMemory: T[] = [];
+    for (let i = 0; i < hms; i++) {
         hMemory.push(problem.generateSolution());
+    }
 
     for (let i = 0; i < maxIt; i++) {
         let is;
-        if (hmcr > Math.random())
+        if (hmcr > Math.random()) {
             is = problem.generateNeighbors(
                 hMemory[randInt(0, hMemory.length)],
                 kDiffer, // Variation respecting the selected one
             )[0];
-        else
+        } else {
             is = problem.generateSolution();
+        }
 
-        let w = findWorst();
-        if (problem.solutionValue(is) >= problem.solutionValue(hMemory[w]))
+        const w = findWorst();
+        if (problem.solutionValue(is) >= problem.solutionValue(hMemory[w])) {
             hMemory[w] = is;
+        }
     }
 
     return hMemory[findBest()];
@@ -83,7 +89,7 @@ export function harmonicSearch<T>(problem: NPProblem<T>,
         let kValue = -Infinity;
 
         for (let i = 0; i < hMemory.length; i++) {
-            let iValue = problem.solutionValue(hMemory[i]);
+            const iValue = problem.solutionValue(hMemory[i]);
             if (kValue < iValue) {
                 k = i;
                 kValue = iValue;
@@ -102,7 +108,7 @@ export function harmonicSearch<T>(problem: NPProblem<T>,
         let kValue = Infinity;
 
         for (let i = 0; i < hMemory.length; i++) {
-            let iValue = problem.solutionValue(hMemory[i]);
+            const iValue = problem.solutionValue(hMemory[i]);
             if (kValue > iValue) {
                 k = i;
                 kValue = iValue;

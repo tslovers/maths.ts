@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import sieveOfEratosthenes from './sieve';
+import {sieveOfEratosthenes} from './sieve';
 
 /**
  * Represents an array of prime numbers from 0 to 1100401, it helps to
@@ -30,13 +30,14 @@ export const PRIMES = sieveOfEratosthenes();
  * @return An array containing all prime factors of n.
  */
 export function getPrimeFactors(n: number): number[] {
-    let factors = [];
+    const factors = [];
 
-    for (let i = 0; PRIMES[i] <= n; i++)
+    for (let i = 0; PRIMES[i] <= n; i++) {
         while (n % PRIMES[i] === 0) {
             factors.push(PRIMES[i]);
             n /= PRIMES[i];
         }
+    }
 
     return factors;
 }
@@ -60,12 +61,14 @@ export function lcm(...ns: number[]): number {
 export function gcd(...ns: number[]): number {
     let common = 1;
 
-    for (let i = 0; !isGCDDone(PRIMES[i], ns); i++)
+    for (let i = 0; !isGCDDone(PRIMES[i], ns); i++) {
         while (isDivisible(PRIMES[i], ns)) {
             common *= PRIMES[i];
-            for (let j = 0; j < ns.length; j++)
+            for (let j = 0; j < ns.length; j++) {
                 ns[j] /= PRIMES[i];
+            }
         }
+    }
 
     return common;
 }
@@ -77,9 +80,12 @@ export function gcd(...ns: number[]): number {
  * @return true if the gcd needs to finish now.
  */
 function isGCDDone(divisor: number, ns: number[]): boolean {
-    for (let n of ns)
-        if (divisor > n)
+    for (const n of ns) {
+        if (divisor > n) {
             return true;
+        }
+    }
+
     return false;
 }
 
@@ -90,8 +96,11 @@ function isGCDDone(divisor: number, ns: number[]): boolean {
  * @return true if all numbers in ns are divisible between divisor.
  */
 function isDivisible(divisor: number, ns: number[]): boolean {
-    for (let n of ns)
-        if (n % divisor !== 0)
+    for (const n of ns) {
+        if (n % divisor !== 0) {
             return false;
+        }
+    }
+
     return true;
 }

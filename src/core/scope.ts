@@ -26,10 +26,11 @@ export let operators: any = {
         priority: 1,
         params: 2,
         fn: (nodeA: Node, nodeB: Node, scope: any) => {
-            let a = nodeA.getNumberValue(scope),
+            const a = nodeA.getNumberValue(scope),
                 b = nodeB.getNumberValue(scope);
-            if (a !== undefined && b !== undefined)
+            if (a !== undefined && b !== undefined) {
                 return a + b;
+            }
             return undefined;
         }
     },
@@ -37,10 +38,11 @@ export let operators: any = {
         priority: 1,
         params: 2,
         fn: (nodeA: Node, nodeB: Node, scope: any) => {
-            let a = nodeA.getNumberValue(scope),
+            const a = nodeA.getNumberValue(scope),
                 b = nodeB.getNumberValue(scope);
-            if (a !== undefined && b !== undefined)
+            if (a !== undefined && b !== undefined) {
                 return a - b;
+            }
             return undefined;
         }
     },
@@ -48,10 +50,11 @@ export let operators: any = {
         priority: 2,
         params: 2,
         fn: (nodeA: Node, nodeB: Node, scope: any) => {
-            let a = nodeA.getNumberValue(scope),
+            const a = nodeA.getNumberValue(scope),
                 b = nodeB.getNumberValue(scope);
-            if (a !== undefined && b !== undefined)
+            if (a !== undefined && b !== undefined) {
                 return a * b;
+            }
             return undefined;
         }
     },
@@ -59,10 +62,11 @@ export let operators: any = {
         priority: 2,
         params: 2,
         fn: (nodeA: Node, nodeB: Node, scope: any) => {
-            let a = nodeA.getNumberValue(scope),
+            const a = nodeA.getNumberValue(scope),
                 b = nodeB.getNumberValue(scope);
-            if (a !== undefined && b !== undefined)
+            if (a !== undefined && b !== undefined) {
                 return a / b;
+            }
             return undefined;
         }
     },
@@ -70,10 +74,11 @@ export let operators: any = {
         priority: 3,
         params: 2,
         fn: (nodeA: Node, nodeB: Node, scope: any) => {
-            let a = nodeA.getNumberValue(scope),
+            const a = nodeA.getNumberValue(scope),
                 b = nodeB.getNumberValue(scope);
-            if (a !== undefined && b !== undefined)
+            if (a !== undefined && b !== undefined) {
                 return Math.pow(a, b);
+            }
             return undefined;
         }
     },
@@ -82,18 +87,21 @@ export let operators: any = {
         params: 1,
         fn: (node: Node, scope: any) => {
             let aux;
-            if ((aux = node.getNumberValue(scope)) !== undefined)
+            if ((aux = node.getNumberValue(scope)) !== undefined) {
                 return fact(aux);
+            }
             return aux;
 
             function fact(i: number): number {
-                if (i < 0 || Math.floor(i) === i)
+                if (i < 0 || Math.floor(i) === i) {
                     throw new InputError(
                         'At this moment we are only capable to calculate ' +
                         'positive integers[0, inf).'
                     ); // TODO: factorial function (Gamma)
-                if (i < 2)
+                }
+                if (i < 2) {
                     return 1;
+                }
                 return i * fact(i - 1);
             }
         }
@@ -107,56 +115,63 @@ export let functions: any = {
     sin: {
         fn: (node: Node, scope?: any) => {
             let aux: number;
-            if ((aux = node.getNumberValue(scope)) !== undefined)
+            if ((aux = node.getNumberValue(scope)) !== undefined) {
                 return Math.sin(aux);
+            }
             return aux;
         }
     },
     cos: {
         fn: (node: Node, scope?: any) => {
             let aux: number;
-            if ((aux = node.getNumberValue(scope)) !== undefined)
+            if ((aux = node.getNumberValue(scope)) !== undefined) {
                 return Math.cos(aux);
+            }
             return aux;
         }
     },
     tan: {
         fn: (node: Node, scope?: any) => {
             let aux: number;
-            if ((aux = node.getNumberValue(scope)) !== undefined)
+            if ((aux = node.getNumberValue(scope)) !== undefined) {
                 return Math.tan(aux);
+            }
             return aux;
         }
     },
     asin: {
         fn: (node: Node, scope?: any) => {
             let aux: number;
-            if ((aux = node.getNumberValue(scope)) !== undefined)
+            if ((aux = node.getNumberValue(scope)) !== undefined) {
                 return Math.asin(aux);
+            }
             return aux;
         }
     },
     acos: {
         fn: (node: Node, scope?: any) => {
             let aux: number;
-            if ((aux = node.getNumberValue(scope)) !== undefined)
+            if ((aux = node.getNumberValue(scope)) !== undefined) {
                 return Math.acos(aux);
+            }
             return aux;
         }
     },
     atan: {
         fn: (node: Node, scope?: any) => {
             let aux: number;
-            if ((aux = node.getNumberValue(scope)) !== undefined)
+            if ((aux = node.getNumberValue(scope)) !== undefined) {
                 return Math.atan(aux);
+            }
             return aux;
         }
     },
     log: {
         fn: (node: Node, scope?: any) => {
             let aux: number;
-            if ((aux = node.getNumberValue(scope)) !== undefined)
+            if ((aux = node.getNumberValue(scope)) !== undefined) {
                 return Math.log(aux);
+            }
             return aux;
         }
     }

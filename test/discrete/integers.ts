@@ -17,7 +17,7 @@
 import {randInt, factorial} from '../../src/discrete/integers';
 import {expect} from 'chai';
 
-let SLACK: number = 0.0001;
+const SLACK = 0.0001;
 
 describe('discrete::integers', () => {
     it('Range random int', () => {
@@ -42,14 +42,15 @@ describe('discrete::integers', () => {
         let n = randInt(0, 10);
         let m = randInt(0, 10);
         if (m < n) {
-            let aux = n;
+            const aux = n;
             n = m;
             m = n;
         }
         let fact = 1;
-        for (let i = n + 1; i <= m; i++)
+        for (let i = n + 1; i <= m; i++) {
             fact *= i;
+        }
 
-        expect(factorial(m)/factorial(n)).to.equals(fact);
+        expect(factorial(m) / factorial(n)).to.equals(fact);
     });
 });

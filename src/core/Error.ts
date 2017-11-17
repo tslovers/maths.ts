@@ -24,9 +24,10 @@ export class InputError extends Error {
     private input: string;
 
     constructor(error: string | InputErrorInfo) {
-        if (typeof error === 'string')
+        if (typeof error === 'string') {
             super(error);
-        else
+        } else {
             super(error.message + ' -- at: ' + error.input);
+        }
     }
 }

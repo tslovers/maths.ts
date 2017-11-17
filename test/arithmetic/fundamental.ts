@@ -20,9 +20,9 @@ import {gcd, lcm} from '../../src/arithmetic';
 import {getRandomNatural} from '../../src/utils/index';
 
 describe('Lattice theory - Laws for GCD & LCM', () => {
-    let a = getRandomNatural(2, 1000);
-    let b = getRandomNatural(2, 1000);
-    let c = getRandomNatural(2, 1000);
+    const a = getRandomNatural(2, 1000);
+    const b = getRandomNatural(2, 1000);
+    const c = getRandomNatural(2, 1000);
 
     it('Commutative law', () => {
         expect(lcm(a, b)).to.equals(lcm(a, b));

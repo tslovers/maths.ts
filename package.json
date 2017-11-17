@@ -5,8 +5,9 @@
   "main": "./lib/maths.js",
   "types": "./lib/maths.d.ts",
   "scripts": {
-    "test": "mocha -r ts-node/register test/*.ts test/**/*.ts",
+    "test": "gulp lint && mocha -r ts-node/register test/*.ts test/**/*.ts",
     "prepare": "gulp",
+    "lint": "gulp lint",
     "build": "gulp",
     "watch": "gulp watch",
     "coverage-test": "nyc npm test",
@@ -42,11 +43,13 @@
     "chai": "latest",
     "gulp": "^3.9.1",
     "gulp-minify": "^1.0.0",
+    "gulp-tslint": "^8.1.2",
     "gulp-typescript": "^3.2.3",
     "gulp-webpack": "^1.5.0",
     "mocha": "latest",
     "run-sequence": "^2.2.0",
     "ts-node": "latest",
+    "tslint": "^5.8.0",
     "typescript": "latest"
   },
   "dependencies": {

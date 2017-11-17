@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import sieveOfEratosthenes from './sieve';
+import {sieveOfEratosthenes} from './sieve';
 
 export {
     sieveOfEratosthenes

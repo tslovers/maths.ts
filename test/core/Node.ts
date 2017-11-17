@@ -20,7 +20,7 @@ import Node from '../../src/core/Node';
 
 describe('core::Node', () => {
     it('Build', () => {
-        let n = new Node('1*-1.4/(3+(2))+(1+1)+(sin(pi))+1-1');
+        const n = new Node('1*-1.4/(3+(2))+(1+1)+(sin(pi))+1-1');
         expect(1.72).to.equals(n.numberValue);
     });
 

@@ -18,7 +18,7 @@
 import * as _debug from 'debug';
 
 import {randInt} from '../discrete/integers';
-import {NPProblem} from '../NP/index';
+import {NPProblem} from './';
 
 const debug = _debug('mh::sa');
 
@@ -38,11 +38,11 @@ const debug = _debug('mh::sa');
  * @returns The solution found by this algorithm.
  */
 export function simulatedAnnealing<T>(problem: NPProblem<T>,
-                                   nNeighbors: number = 1,
-                                   kDiffer: number = 2,
-                                   t0: number = 100, tf: number = 0,
-                                   tDecrease: (t: number) => number = decrease,
-                                   sRepetitions: number = 5): T{
+                                      nNeighbors: number = 1,
+                                      kDiffer: number = 2,
+                                      t0: number = 100, tf: number = 0,
+                                      tDecrease: (t: number) => number = decrease,
+                                      sRepetitions: number = 5): T {
     // Generates an initial solution
     let solution = problem.generateSolution();
     // Calculates the 'energy' of the initial solution
@@ -52,12 +52,12 @@ export function simulatedAnnealing<T>(problem: NPProblem<T>,
     for (let t = t0; t > tf;) {
         // Generates nNeighbor candidates solutions from the neighborhood of
         // s, then picks one.
-        let cSolution = problem
+        const cSolution = problem
             .generateNeighbors(solution, kDiffer, nNeighbors)[randInt(0, nNeighbors)];
         // Calculates 'energy' of candidate solution
-        let csEnergy = problem.solutionValue(cSolution);
+        const csEnergy = problem.solutionValue(cSolution);
         // Calculates the difference between 'energies'
-        let AE = sEnergy - csEnergy;
+        const AE = sEnergy - csEnergy;
         // Informative, only when debugging
         debug('Temperature = ' + t, 'e^(AE/t) = ' + Math.exp(AE / t));
         debug('curS: ' + solution, 'canS: ' + cSolution);

@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-import {tabooSearch} from './metaheuristics/tabooSearch';
+import {tabooSearch} from '../../metaheuristics/tabooSearch';
 import {table} from 'table';
-import * as NP from './NP';
 import * as fs from 'fs';
+import {generateLOP} from './lop';
 
-let filename = process.env.FILE || './assets/testMatrix';
-let problemName = filename.split('/').pop();
+const filename = process.env.FILE || './assets/testMatrix';
+const problemName = filename.split('/').pop();
 
 // Number of repetitions for each permutation of parameters
-const reps: number = 30;
+const reps = 30;
 // Possible parameters
-let iterations = [500, 1000, 1500];
-let neighborhoodSize = [5, 15, 25];
-let tabooListSize = [5, 15, 25];
-let neighborhoodDiversity = [0.05, 0.1, 0.15];
+const iterations = [500, 1000, 1500];
+const neighborhoodSize = [5, 15, 25];
+const tabooListSize = [5, 15, 25];
+const neighborhoodDiversity = [0.05, 0.1, 0.15];
 
 fs.readFile(filename, 'utf8', (err, data: string) => {
     if (err) {
@@ -37,18 +37,19 @@ fs.readFile(filename, 'utf8', (err, data: string) => {
         return;
     }
 
-    let formattedData = data.split(/[\n ]/);
-    let n = Number(formattedData.shift());
-    let dataset = [];
+    const formattedData = data.split(/[\n ]/);
+    const n = Number(formattedData.shift());
+    const dataset = [];
     for (let i = 0; i < n; i++) {
         dataset.push([]);
-        for (let j = 0; j < n; j++)
+        for (let j = 0; j < n; j++) {
             dataset[i].push(Number(formattedData.shift()));
+        }
     }
 
     console.log('Problem: ' + problemName);
-    let lop = NP.generateLOP(dataset);
-    let report: any[][] = [
+    const lop = generateLOP(dataset);
+    const report: any[][] = [
         ['Param', 'tMin', 'tMax', 'tAvg', 'hMin', 'hMax', 'hAvg']
     ];
     let gTime = +new Date();
@@ -66,27 +67,31 @@ fs.readFile(filename, 'utf8', (err, data: string) => {
                         0
                     ]);
                     // Checks the iteration number
-                    let it = report.length - 1;
+                    const it = report.length - 1;
                     for (let i = 0; i < reps; i++) {
                         // To check time later
                         let time = +new Date();
                         // Generate solution
-                        let s = tabooSearch(lop, ns, nv, tls, t);
-                        let h = lop.solutionValue(s);
+                        const s = tabooSearch(lop, ns, nv, tls, t);
+                        const h = lop.solutionValue(s);
                         // Time spent
                         time = +new Date() - time;
 
                         report[it][6] += h;
                         report[it][3] += time;
 
-                        if (report[it][1] > time)
+                        if (report[it][1] > time) {
                             report[it][1] = time;
-                        if (report[it][2] < time)
+                        }
+                        if (report[it][2] < time) {
                             report[it][2] = time;
-                        if (report[it][4] > h)
+                        }
+                        if (report[it][4] > h) {
                             report[it][4] = h;
-                        if (report[it][5] < h)
+                        }
+                        if (report[it][5] < h) {
                             report[it][5] = h;
+                        }
                     }
                     report[it][6] = Math.round(report[it][6] / reps);
                     report[it][3] = Math.round(report[it][3] / reps);
@@ -100,11 +105,12 @@ fs.readFile(filename, 'utf8', (err, data: string) => {
 
     let csvData = '';
     report.forEach(r => csvData += r.join(',') + '\n');
-    let reportFile = problemName + '.TSReport.csv';
-    fs.writeFile(reportFile, csvData, err => {
-        if (err)
+    const reportFile = problemName + '.TSReport.csv';
+    fs.writeFile(reportFile, csvData, er => {
+        if (er) {
             console.error('Something occurred while saving the report.');
-        else
+        } else {
             console.log('Report saved at ' + reportFile);
+        }
     });
 });

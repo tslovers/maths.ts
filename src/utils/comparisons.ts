@@ -26,9 +26,11 @@ export type criterion = (x: any, y: any) => number;
  */
 export function isAscendingArray(a: any[],
                                  compare: criterion = ascending): boolean {
-    for (let i = 1; i < a.length; i++)
-        if (compare(a[i - 1], a[i]) > 0)
+    for (let i = 1; i < a.length; i++) {
+        if (compare(a[i - 1], a[i]) > 0) {
             return false;
+        }
+    }
 
     return true;
 }
@@ -41,9 +43,11 @@ export function isAscendingArray(a: any[],
  * @return true if the array is sorted backwardly, false otherwise.
  */
 export function isDescendingArray(a: any[], compare: criterion = descending) {
-    for (let i = 1; i < a.length; i++)
-        if (compare(a[i - 1], a[i]) > 0)
+    for (let i = 1; i < a.length; i++) {
+        if (compare(a[i - 1], a[i]) > 0) {
             return false;
+        }
+    }
 
     return true;
 }
@@ -55,12 +59,15 @@ export function isDescendingArray(a: any[], compare: criterion = descending) {
  * @return 0 if a equals b, 1 if a > b, -1 if b < a of a or b are undefined.
  */
 export function ascending(a: any, b: any): number {
-    if (a === undefined || b === undefined)
+    if (a === undefined || b === undefined) {
         return -1;
-    if (a === b)
+    }
+    if (a === b) {
         return 0;
-    if (a < b)
+    }
+    if (a < b) {
         return -1;
+    }
     return 1;
 }
 
@@ -71,11 +78,14 @@ export function ascending(a: any, b: any): number {
  * @return 0 if a equals b, 1 if a < b, -1 if b > a of a or b are undefined.
  */
 export function descending(a: any, b: any): number {
-    if (a === undefined || b === undefined)
+    if (a === undefined || b === undefined) {
         return -1;
-    if (a === b)
+    }
+    if (a === b) {
         return 0;
-    if (a < b)
+    }
+    if (a < b) {
         return 1;
+    }
     return -1;
 }

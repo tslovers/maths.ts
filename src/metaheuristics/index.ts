@@ -16,4 +16,18 @@
  */
 
 export * from './simulatedAnnealing';
+export * from './harmonySearch';
 export * from './tabooSearch';
+
+/**
+ * Metaheuristics are meant to solve NP Problems, this NPProblem interface
+ * tries to define a generic use of NPProblems, where T is the type of
+ * solution the algorithm will use.
+ */
+export interface NPProblem<T> {
+    solutionValue: (s: T) => number;
+    generateSolution: () => any;
+    compareSolutions: (a: T, b: T) => boolean;
+    generateNeighbors: (s: T, kDiffer?: number, nNeighbors?: number) => T[];
+    description?: any;
+}

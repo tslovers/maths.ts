@@ -40,11 +40,13 @@ export function aStar(graph: Graph, source: number, destination: number,
      */
     function push(e: VertexElement): void {
         let i;
-        for (i = 0; i < this.vertexes.length; i++)
+        for (i = 0; i < this.vertexes.length; i++) {
             if (graph.heuristicValue(this.vertexes[i].id, destination) +
                 this.vertexes[i].cost >
-                graph.heuristicValue(e.id, destination) + e.cost)
+                graph.heuristicValue(e.id, destination) + e.cost) {
                 break;
+            }
+        }
         this.vertexes.splice(i, 0, e);
     }
 }

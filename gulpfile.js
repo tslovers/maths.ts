@@ -1,5 +1,6 @@
 let gulp = require('gulp');
 let ts = require('gulp-typescript');
+let tsLint = require('gulp-tslint');
 let webpack = require('gulp-webpack');
 let compress = require('gulp-minify');
 let runSeq = require('run-sequence');
@@ -15,6 +16,13 @@ gulp.task('ts', function () {
     let tsResult = tsProject.src().pipe(tsProject());
     tsResult.dts.pipe(gulp.dest('lib'));
     return tsResult.js.pipe(gulp.dest('lib'));
+});
+
+gulp.task('lint', function () {
+    // noinspection JSUnresolvedFunction
+    gulp.src(['src/**/*.ts', 'test/**/*.ts'])
+        .pipe(tsLint())
+        .pipe(tsLint.report());
 });
 
 gulp.task('watch', ['ts'], function () {

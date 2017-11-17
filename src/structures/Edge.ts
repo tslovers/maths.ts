@@ -24,29 +24,25 @@ import {weightFunc} from './Graph';
  * and optionally a weight and name.
  */
 export default class Edge {
-    private _source: Vertex;
-    private _destination: Vertex;
     private _weight: number;
     private weightFunction: weightFunc;
-    public info: any;
 
     /**
      * Builds this with respective source, destination, weight(optional) and
      * name(optional).
-     * @param source The source of this.
-     * @param destination The destination of this.
+     * @param _source The source of this.
+     * @param _destination The destination of this.
      * @param weight The weight for this. It may be the result of a function
      * or just a number.
      * @param info Additional name for this.
      */
-    constructor(source: Vertex, destination: Vertex,
-                weight?: number | weightFunc, info?: any) {
-        this.source = source;
-        this.destination = destination;
-        if (typeof weight === 'number')
+    constructor(private _source: Vertex, private _destination: Vertex,
+                weight?: number | weightFunc, public info?: any) {
+        if (typeof weight === 'number') {
             this.weight = weight;
-        else
+        } else {
             this.setWeightFunction(weight);
+        }
         this.info = info;
     }
 
@@ -89,12 +85,13 @@ export default class Edge {
      * @return The weight associated to this edge.
      */
     get weight(): number {
-        if (this.weightFunction)
+        if (this.weightFunction) {
             return this.weightFunction(this.source, this.destination);
-        else if (this._weight === undefined)
+        } else if (this._weight === undefined) {
             return 1;
-        else
+        } else {
             return this._weight;
+        }
     }
 
     /**

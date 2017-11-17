@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import * as discrete from '../discrete';
-import {InputError} from '../core/Error';
-import {NPProblem} from './index';
-import {randInt} from '../discrete/integers';
+import {randInt} from '../../discrete/integers';
+import * as discrete from '../../discrete';
+import {InputError} from '../../core/Error';
+import {NPProblem} from '../../metaheuristics/index';
 
 /**
  * Generates a Linear Ordering Problem with a given matrix of weights ready to
@@ -26,10 +26,12 @@ import {randInt} from '../discrete/integers';
  * @param wij The matrix of weights for the linear ordering problem.
  */
 export function generateLOP(wij: number[][]): NPProblem<number[]> {
-    for (let i = 0; i < wij.length; i++)
-        if (wij.length !== wij[i].length)
+    for (let i = 0; i < wij.length; i++) {
+        if (wij.length !== wij[i].length) {
             throw new InputError('The received matrix is not a square matrix');
-    let nodes = wij.length;
+        }
+    }
+    const nodes = wij.length;
 
     return {
         solutionValue: solutionValue,
@@ -44,11 +46,14 @@ export function generateLOP(wij: number[][]): NPProblem<number[]> {
      * @param b The other solution to compare.
      */
     function compareSolutions(a: number[], b: number[]): boolean {
-        if (a.length !== b.length)
+        if (a.length !== b.length) {
             return false;
-        for (let i = 0; i < a.length; i++)
-            if (a[i] !== b[i])
+        }
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -61,9 +66,11 @@ export function generateLOP(wij: number[][]): NPProblem<number[]> {
     function solutionValue(s: number[]): number {
         let value = 0;
 
-        for (let i = 0; i < s.length; i++)
-            for (let j = i + 1; j < s.length; j++)
+        for (let i = 0; i < s.length; i++) {
+            for (let j = i + 1; j < s.length; j++) {
                 value += wij[s[i]][s[j]];
+            }
+        }
 
         return value;
     }
@@ -89,27 +96,28 @@ export function generateLOP(wij: number[][]): NPProblem<number[]> {
     function generateNeighbors(curSolution: number[],
                                kDiffer: number = 2,
                                nNeighbors: number = 1): number[][] {
-        let permutations: number[][] = [];
+        const permutations: number[][] = [];
 
-        if (kDiffer > 0 && kDiffer < 1)
-        // If its a proportion calculate the number of times to change this.
+        if (kDiffer > 0 && kDiffer < 1) {
+            // If its a proportion calculate the number of times to change this.
             kDiffer = Math.ceil(curSolution.length * kDiffer);
-        else if (kDiffer >= 1)
-        // If its an integer calculates the ceil in case the user send a float.
+        } else if (kDiffer >= 1) {
+            // If its an integer calculates the ceil in case the user send a float.
             kDiffer = Math.ceil(kDiffer);
-        else
-        // If the user is stupid just go with 2
+        } else {
+            // If the user is stupid just go with 2
             kDiffer = 2;
+        }
 
         while (permutations.length < nNeighbors) {
-            let perm = curSolution.slice();
+            const perm = curSolution.slice();
             for (let k = 0; k < kDiffer; k++) {
                 let i = 0, j = 0;
                 while (i === j && curSolution.length !== 1) {
                     i = randInt(0, curSolution.length);
                     j = randInt(0, curSolution.length);
                 }
-                let p = perm[i];
+                const p = perm[i];
                 perm[i] = perm[j];
                 perm[j] = p;
             }

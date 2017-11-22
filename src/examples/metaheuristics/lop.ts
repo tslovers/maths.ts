@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-import {randInt} from '../../discrete/integers';
-import * as discrete from '../../discrete';
-import {InputError} from '../../core/Error';
 import {NPProblem} from '../../metaheuristics/index';
+import {randInt} from '../../discrete/integers';
+import {InputError} from '../../core/Error';
+import * as discrete from '../../discrete';
+import {BitSet} from 'std.ts';
 
 /**
  * Generates a Linear Ordering Problem with a given matrix of weights ready to
@@ -31,13 +32,15 @@ export function generateLOP(wij: number[][]): NPProblem<number[]> {
             throw new InputError('The received matrix is not a square matrix');
         }
     }
+
     const nodes = wij.length;
 
     return {
         solutionValue: solutionValue,
         generateSolution: generateSolution,
         generateNeighbors: generateNeighbors,
-        compareSolutions: compareSolutions
+        compareSolutions: compareSolutions,
+        crossover: crossover
     };
 
     /**
@@ -125,5 +128,58 @@ export function generateLOP(wij: number[][]): NPProblem<number[]> {
         }
 
         return permutations;
+    }
+
+    function crossover(a: number[],
+                       b: number[],
+                       variation: number = .5): number[][] {
+        const children: number[][] = [];
+        // Initializing mask
+        const mask = new BitSet(a.length);
+        const vNumber = Math.ceil(variation * a.length);
+        const aBased: number[] = [],
+            bBased: number[] = [],
+            acBased: number[] = [],
+            bcBased: number[] = [];
+
+        for (let i = 0; i < vNumber; i++) {
+            while (mask.numOn <= i) {
+                const n = randInt(0, a.length);
+                if (!mask.get(n)) {
+                    aBased[n] = a[n];
+                    bBased[n] = b[n];
+                    mask.set(n, true);
+                }
+            }
+        }
+
+        let j = -1;
+        // Finds first empty space
+        while (aBased[++j] !== undefined) {}
+        let k = j;
+
+        let str = '[ ';
+        for (let i = 0; i < mask.size; i++) {
+            if (i !== 0) {
+                str += ', ';
+            }
+            str += mask.get(i) ? '1' : '0';
+        }
+        str += ' ]';
+        for (let i = 0; i < a.length; i++) {
+            if (aBased.indexOf(b[i]) === -1) {
+                aBased[j] = b[i];
+                while (aBased[++j] !== undefined) {}
+            }
+            if (bBased.indexOf(a[i]) === -1) {
+                bBased[k] = a[i];
+                while (bBased[++k] !== undefined) {}
+            }
+        }
+
+        children.push(aBased);
+        children.push(bBased);
+
+        return children;
     }
 }

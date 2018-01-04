@@ -2,7 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "rootDir": ".",
-    "target": "es5",
+    "target": "es2015",
     "module": "commonjs",
     "declaration": true,
     "sourceMap": true,

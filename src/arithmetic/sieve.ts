@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import BitSet from '../structures/BitSet';
+import {BitSet} from 'std.ts';
 
 /**
  * Default PRIMES's max prime number.

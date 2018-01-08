@@ -25,7 +25,8 @@
 import * as fs from 'fs';
 import {AntColony} from './ant';
 
-const filename = process.env.FILE || './assets/1.tsp';
+const filename = process.env.FILE || './assets/4.tsp';
+// Best solution for 4.tsp: 0 1 2 3 9 8 7 6 5 4
 
 fs.readFile(filename, 'utf8', (err, data: string) => {
     const towns = data.split(/\r?\n/).map( p => {
@@ -37,4 +38,5 @@ fs.readFile(filename, 'utf8', (err, data: string) => {
     });
 
     const colony = new AntColony(towns);
+    colony.optimize().then(s => console.log(s.distance));
 });

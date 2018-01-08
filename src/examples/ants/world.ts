@@ -19,6 +19,8 @@ import {Coordinate} from '../../plotter/index';
 import {PriorityQueue} from 'std.ts';
 import * as debug from 'debug';
 
+export const K = 100; // This will be a factor to multiply distance
+
 /**
  * Edges are symmetrical, that is AB == BA. They have pheromones, a distance
  * saved in order to avoid constant recalculation.
@@ -63,7 +65,7 @@ export class World {
         // Updates information about neighbors and edges
         this.debug('Sorting neighbors for each town');
         for (let i = 0; i < this.towns.length; i++) {
-            const nQueue = new PriorityQueue<number>(genCmp(i, this));
+            const nQueue = new PriorityQueue<number>(genCmp(i).bind(this));
             for (let j = 0; j < this.towns.length; j++) {
                 if (i > j) {
                     this.towns[i].edges[j] = this.towns[j].edges[i];
@@ -71,9 +73,10 @@ export class World {
                         throw new Error('PUM!');
                     }
                 } else if (i < j) {
+                    const d = this.getDistance(i, j);
                     this.towns[i].edges[j] = {
-                        pheromones: 0,
-                        distance: this.getDistance(i, j)
+                        pheromones: K / d,
+                        distance: d
                     };
                 }
 
@@ -93,10 +96,10 @@ export class World {
          * @returns A function made to compare two towns according to the
          * distance from another specified town.
          */
-        function genCmp(town: number, ctx: World) {
-            return (a: number, b: number) => {
-                const aDistance = ctx.getDistance(town, a);
-                const bDistance = ctx.getDistance(town, b);
+        function genCmp(town: number) {
+            return function (a: number, b: number) {
+                const aDistance = this.getDistance(town, a);
+                const bDistance = this.getDistance(town, b);
 
                 if (aDistance > bDistance) {
                     return -1;

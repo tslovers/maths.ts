@@ -1,13 +1,12 @@
 # Editor files
-.idea/
+.idea
 *.iml
 # Node files
-node_modules/
-.tscache/
+node_modules
+.tscache
 # Library files, unneeded in development 'cause they can be generated with grunt
 # include or not include?
-lib/
+lib
 # include or not include?
-bundle/
+bundle
 package-lock.json
-assets

@@ -17,18 +17,15 @@
 
 import {Coordinate} from '../../plotter/index';
 import {randInt} from '../../discrete/integers';
-import {World, K} from './world';
+import {World, K, Town} from './world';
 import * as debug from 'debug';
 import {upperBound} from 'std.ts';
 
+// Default values
 const af = 0.1; // Ant factor
-// Original amount of pheromones
-const er = 0.8; // Pheromone evaporation rate
-const BETA = 1.8; // Trail preference
-const ALPHA = 1.8; // Greedy preference
-// New pheromone deposit preference
-// Pure random selection rate
-// const problemName = filename.split('/').pop();
+const er = 0.9; // Pheromone evaporation rate
+const BETA = 1.9; // Trail preference
+const ALPHA = 1.7; // Greedy preference
 
 export interface Solution {
     distance: number;
@@ -47,35 +44,36 @@ export class AntColony {
     /**
      * Creates a new colony of ants (antFactor*towns.length ants).
      * @param towns An array holding the coordinates of each town.
-     * @param antFactor This value multiplied by the number of towns
-     * delivers the number of ants to be used.
-     * @param evaporationRate The rules of how fast old pheromones evaporate.
-     * @param alpha The pheromone preference.
-     * @param beta The greedy preference.
      */
-    constructor(towns: Coordinate[],
-                private antFactor: number = af,
-                private evaporationRate = er,
-                private alpha = ALPHA,
-                private beta = BETA) {
+    constructor(towns: Coordinate[]) {
         this.debug('Creating World of Towns');
-        this.world = new World(towns, evaporationRate);
+        this.world = new World(towns);
     }
 
     /**
      * Performs the Ant Colony Optimization by putting each ant to find a
      * solution.
      * @param iterations The number of times to reach a new solution per ant.
+     * @param antFactor This value multiplied by the number of towns
+     * delivers the number of ants to be used.
+     * @param evaporationRate The rules of how fast old pheromones evaporate.
+     * @param alpha The pheromone preference.
+     * @param beta The greedy preference.
      */
-    async optimize(iterations: number = 5): Promise<Solution> {
+    async optimize(iterations: number = 5,
+                   antFactor = af,
+                   evaporationRate = er,
+                   alpha = ALPHA,
+                   beta = BETA): Promise<Solution> {
         this.debug('Generating ants');
         // Generating ants
-        const ants = Math.ceil(this.antFactor * this.world.towns.length);
+        const ants = Math.ceil(antFactor * this.world.towns.length);
         this.ants = [];
         for (let i = 0; i < ants; i++) {
-            this.ants.push(new Ant(i, this.world, this.alpha, this.beta));
+            this.ants.push(new Ant(i, this.world, alpha, beta));
         }
-        this.debug('Ants were successfully created');
+        this.debug('Putting initial pheromones');
+        this.world.reset();
         // Performing optimization
         let best: Solution = {
             path: undefined,
@@ -94,13 +92,26 @@ export class AntColony {
                     if (best.distance > s.distance) {
                         this.debug('Iteration ' + k + '.. Solution beaten');
                         best = s;
-                    } else  if (best.distance === s.distance) {
+                    } else if (best.distance === s.distance) {
                         this.debug('Iteration ' + k + '.. Solution equalized');
+                    }
+
+                    // Experimental improvement: The idea is that if the
+                    // final distance after this solutions is good, then
+                    // reinforcement of each edge on this path would improve
+                    // even more the solution
+                    /// Reference: ACO Algorithm with Additional Reinforcement
+                    /// https://link.springer.com/chapter/10.1007/3-540-45724-0_31
+                    const p = K / s.distance;
+                    for (let i = 0; i < s.path.length; i++) {
+                        const next = (i + 1) % s.path.length;
+                        this.world.towns[s.path[i]].edges[s.path[next]].pheromones += p;
                     }
                 });
 
                 this.debug(k + ' iteration. Best solution: ' + best.distance);
             });
+            this.world.evaporate(evaporationRate);
         }
 
         this.debug('Best solution: ' + best.distance);
@@ -131,7 +142,7 @@ export class Ant {
         // Update list of towns left
         this.townsVisited = [];
         // Create origin
-        this.path = [randInt(0, this.world.towns.length)];
+        this.path = [randInt(0, this.towns.length)];
         this.debug('Starting town selected: ' + this.town);
         this.townsVisited[this.town] = true;
     }
@@ -141,7 +152,7 @@ export class Ant {
      * @returns {Promise<Solution>}
      */
     async tour(): Promise<Solution> {
-        while (this.path.length < this.world.towns.length) {
+        while (this.path.length < this.towns.length) {
             this.tourNext();
         }
 
@@ -158,7 +169,7 @@ export class Ant {
         const pp: number[] = [];
         let sum = 0;
         nearest.forEach(t => {
-            const neighbor = this.world.towns[t];
+            const neighbor = this.towns[t];
             const p = neighbor.edges[this.town].pheromones ** this.alpha +
                 (K / neighbor.edges[this.town].distance) ** this.beta;
             sum += p;
@@ -176,8 +187,9 @@ export class Ant {
         let nextTown = upperBound(pp, 0, pp.length, Math.random());
         nextTown = nearest[nextTown];
         // this.debug('Next town: ' + nextTown);
-        this.distanceTraveled +=
-            this.world.towns[this.town].edges[nextTown].distance;
+        const d = this.towns[this.town].edges[nextTown].distance;
+        this.distanceTraveled += d;
+        this.towns[this.town].edges[nextTown].pheromones += K / d;
         this.path.push(nextTown);
         this.townsVisited[this.town] = true;
     }
@@ -190,15 +202,23 @@ export class Ant {
     findNearest(limit: number = Infinity): number[] {
         // The current town where the ant is
         const neighbors = [];
-        for (let i = 0; i < this.world.towns[this.town].neighbors.length; i++) {
+        for (let i = 0; i < this.towns[this.town].neighbors.length; i++) {
             if (neighbors.length >= limit) {
                 break;
             }
-            if (!this.townsVisited[this.world.towns[this.town].neighbors[i]]) {
-                neighbors.push(this.world.towns[this.town].neighbors[i]);
+            if (!this.townsVisited[this.towns[this.town].neighbors[i]]) {
+                neighbors.push(this.towns[this.town].neighbors[i]);
             }
         }
         return neighbors;
+    }
+
+    /**
+     * Gets the towns on this ant's world.
+     * @returns The towns on this ant's world.
+     */
+    get towns(): Town[] {
+        return this.world.towns;
     }
 
     /**
@@ -214,7 +234,7 @@ export class Ant {
      */
     get curSolution(): Solution {
         // Distance from end to start
-        const d = this.world.towns[this.town].edges[this.path[0]].distance;
+        const d = this.towns[this.town].edges[this.path[0]].distance;
         return {
             path: this.path.slice(),
             // Travel distance + distance from end to start

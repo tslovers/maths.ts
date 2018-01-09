@@ -23,13 +23,19 @@
  */
 
 import * as fs from 'fs';
-import {AntColony} from './ant';
+import {AntColony, Solution} from './ant';
 
-const filename = process.env.FILE || './assets/4.tsp';
+const filename = process.env.FILE || './assets/tsp/4.tsp';
+const ITS = 3;
 // Best solution for 4.tsp: 0 1 2 3 9 8 7 6 5 4
+const iterations = [50];
+const alphas = [1.8];
+const betas = [1.8];
+const aFactors = [0.2];
+const eRates = [0.9];
 
 fs.readFile(filename, 'utf8', (err, data: string) => {
-    const towns = data.split(/\r?\n/).map( p => {
+    const towns = data.split(/\r?\n/).map(p => {
         const xy = p.split(' ');
         return {
             x: Number(xy[1]),
@@ -38,5 +44,25 @@ fs.readFile(filename, 'utf8', (err, data: string) => {
     });
 
     const colony = new AntColony(towns);
-    colony.optimize().then(s => console.log(s.distance));
+    optimize().then(null);
+
+
+    async function optimize() {
+
+        iterations.forEach(it => {
+            alphas.forEach(a => {
+                betas.forEach(b => {
+                    aFactors.forEach(af => {
+                        eRates.forEach(async er => {
+                            for (let i = 0; i < ITS; i++) {
+                                // Params: (it, af, er, alpha, beta);
+                                const sol = await colony.optimize(it, af, er, a, b);
+                                console.log(sol.distance);
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    }
 });

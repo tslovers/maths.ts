@@ -49,10 +49,8 @@ export class World {
     /**
      * Initializes this world with towns and edges from one town to another.
      * @param townsCoordinates The list of towns on this world.
-     * @param evaporationRate Indicates how fast the pheromones evaporate.
      */
-    constructor(townsCoordinates: Coordinate[],
-                private evaporationRate: number) {
+    constructor(townsCoordinates: Coordinate[]) {
         // Creates the arrays of towns and edges
         this.debug('Mapping towns');
         this._towns = townsCoordinates.map(t => {
@@ -69,10 +67,7 @@ export class World {
             for (let j = 0; j < this.towns.length; j++) {
                 if (i > j) {
                     this.towns[i].edges[j] = this.towns[j].edges[i];
-                    if (!this.towns[i].edges[j]) {
-                        throw new Error('PUM!');
-                    }
-                } else if (i < j) {
+                } else if (i <= j) {
                     const d = this.getDistance(i, j);
                     this.towns[i].edges[j] = {
                         pheromones: K / d,
@@ -92,11 +87,11 @@ export class World {
          * Generates a function to compare and sort according to distances
          * from the received towns to the other town.
          * @param town
-         * @param ctx
          * @returns A function made to compare two towns according to the
          * distance from another specified town.
          */
         function genCmp(town: number) {
+            // As function to be able to use bind method
             return function (a: number, b: number) {
                 const aDistance = this.getDistance(town, a);
                 const bDistance = this.getDistance(town, b);
@@ -115,12 +110,25 @@ export class World {
     /**
      * Updates the quantity of pheromones per path by multiplying the current
      * amount of pheromones times evaporationRate.
+     * @param evaporationRate Determines how fast the pheromones will evaporate.
      */
-    evaporate() {
+    evaporate(evaporationRate: number) {
         for (let i = 0; i < this.towns.length; i++) {
             // Updating half edges because edges are symmetrical
-            for (let j = i + 1; j < this.towns[i].edges.length; j++) {
-                this.towns[i].edges[j].pheromones *= this.evaporationRate;
+            for (let j = i; j < this.towns[i].edges.length; j++) {
+                this.towns[i].edges[j].pheromones *= evaporationRate;
+            }
+        }
+    }
+
+    /**
+     * Resets the initial amount of pheromones on each edge between towns.
+     */
+    reset(): void {
+        for (let i = 0; i < this.towns.length; i++) {
+            for (let j = i + 1; j < this.towns.length; j++) {
+                this.towns[i].edges[j].pheromones =
+                    K / this.towns[i].edges[j].distance;
             }
         }
     }

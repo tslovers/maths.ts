@@ -68,11 +68,11 @@ fs.readFile(filename, 'utf8', (err, data: string) => {
         const bar: any = new progress.Bar({}, progress.Presets.shades_classic);
 
         bar.start(combinations, k = 0);
-        for (let it of iterations) {
-            for (let a of alphas) {
-                for (let b of betas) {
-                    for (let af of aFactors) {
-                        for (let er of eRates) {
+        for (const it of iterations) {
+            for (const a of alphas) {
+                for (const b of betas) {
+                    for (const af of aFactors) {
+                        for (const er of eRates) {
                             let min = Infinity;
                             let max = -Infinity;
                             let avg = 0;

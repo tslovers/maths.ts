@@ -90,10 +90,7 @@ export class AntColony {
                 // Finds best solution
                 solutions.forEach(s => {
                     if (best.distance > s.distance) {
-                        this.debug('Iteration ' + k + '.. Solution beaten');
                         best = s;
-                    } else if (best.distance === s.distance) {
-                        this.debug('Iteration ' + k + '.. Solution equalized');
                     }
 
                     // Experimental improvement: The idea is that if the
@@ -108,13 +105,10 @@ export class AntColony {
                         this.world.towns[s.path[i]].edges[s.path[next]].pheromones += p;
                     }
                 });
-
-                this.debug(k + ' iteration. Best solution: ' + best.distance);
             });
             this.world.evaporate(evaporationRate);
         }
 
-        this.debug('Best solution: ' + best.distance);
         return best;
     }
 }

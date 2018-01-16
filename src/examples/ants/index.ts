@@ -23,16 +23,20 @@
  */
 
 import * as fs from 'fs';
-import {AntColony, Solution} from './ant';
+import {AntColony} from './ant';
 
-const filename = process.env.FILE || './assets/tsp/4.tsp';
-const ITS = 3;
+const progress: any = require('cli-progress');
+const filename = process.env.FILE || './assets/tsp/1.tsp';
+const problemName = filename.split('/').pop();
 // Best solution for 4.tsp: 0 1 2 3 9 8 7 6 5 4
 const iterations = [50];
-const alphas = [1.8];
-const betas = [1.8];
-const aFactors = [0.2];
-const eRates = [0.9];
+const alphas = [2, 2.1];
+const betas = [2, 2.1];
+const aFactors = [0.4, 0.5];
+const eRates = [0.9, 0.7, 0.5];
+const ITS = 30; // Number of iterations per parameter combination
+const combinations = iterations.length * alphas.length * betas.length *
+    aFactors.length * eRates.length * ITS; // Total number of combinations
 
 fs.readFile(filename, 'utf8', (err, data: string) => {
     const towns = data.split(/\r?\n/).map(p => {
@@ -44,25 +48,63 @@ fs.readFile(filename, 'utf8', (err, data: string) => {
     });
 
     const colony = new AntColony(towns);
-    optimize().then(null);
+    optimize().then(report => {
+        let csvData = '';
+        report.forEach(r => csvData += r.join(',') + '\n');
+        const reportFile = problemName + '.AntsReport.csv';
+        fs.writeFile(reportFile, csvData, er => {
+            if (er) {
+                console.error('Something occurred while saving the report.');
+            } else {
+                console.log('Report saved at ' + reportFile);
+            }
+        });
+    });
 
 
     async function optimize() {
+        const report: any[][] = [['Params', 'hMin', 'hMax', 'hAvg', 'tAvg']];
+        let k: number;
+        const bar: any = new progress.Bar({}, progress.Presets.shades_classic);
 
-        iterations.forEach(it => {
-            alphas.forEach(a => {
-                betas.forEach(b => {
-                    aFactors.forEach(af => {
-                        eRates.forEach(async er => {
+        bar.start(combinations, k = 0);
+        for (let it of iterations) {
+            for (let a of alphas) {
+                for (let b of betas) {
+                    for (let af of aFactors) {
+                        for (let er of eRates) {
+                            let min = Infinity;
+                            let max = -Infinity;
+                            let avg = 0;
+                            let tAvg = 0;
                             for (let i = 0; i < ITS; i++) {
                                 // Params: (it, af, er, alpha, beta);
+                                const time = +new Date();
                                 const sol = await colony.optimize(it, af, er, a, b);
-                                console.log(sol.distance);
+                                tAvg += +new Date() - time;
+                                avg += sol.distance;
+                                min = min > sol.distance ? sol.distance : min;
+                                max = max < sol.distance ? sol.distance : max;
+                                bar.update(++k);
                             }
-                        });
-                    });
-                });
-            });
-        });
+
+                            tAvg /= ITS;
+                            avg /= ITS;
+                            report.push([
+                                `it:${it}|a:${a}|b:${b}|af:${af}|er:${er}`,
+                                min.toFixed(2),
+                                max.toFixed(2),
+                                avg.toFixed(2),
+                                tAvg.toFixed(0)
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        bar.stop();
+
+        return report;
     }
 });

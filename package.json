@@ -53,6 +53,7 @@
     "typescript": "latest"
   },
   "dependencies": {
+    "cli-progress": "^1.7.0",
     "debug": "^3.1.0",
     "jquery": "^3.2.1",
     "std.ts": "0.0.7",

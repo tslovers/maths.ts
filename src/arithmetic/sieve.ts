@@ -29,24 +29,24 @@ const LIMIT = 1100401;
  * @return An array with all prime numbers from 0 to max.
  */
 export function sieveOfEratosthenes(max: number = LIMIT): number[] {
-    const bs = new BitSet(max);
-    const maxPrimeSqrt = Math.round(Math.sqrt(max));
-    const primes = [];
+  const bs = new BitSet(max);
+  const maxPrimeSqrt = Math.round(Math.sqrt(max));
+  const primes = [];
 
-    for (let i = 2; i <= maxPrimeSqrt; i++) {
-        if (!bs.get(i)) {
-            primes.push(i);
-            for (let j = 0; j < max; j += i) {
-                bs.set(j, true);
-            }
-        }
+  for (let i = 2; i <= maxPrimeSqrt; i++) {
+    if (!bs.get(i)) {
+      primes.push(i);
+      for (let j = 0; j < max; j += i) {
+        bs.set(j, true);
+      }
     }
-    for (let i = maxPrimeSqrt + ((maxPrimeSqrt & 1) ? 2 : 1);
-         i < max; i += 2) {
-        if (!bs.get(i)) {
-            primes.push(i);
-        }
+  }
+  for (let i = maxPrimeSqrt + ((maxPrimeSqrt & 1) ? 2 : 1);
+       i < max; i += 2) {
+    if (!bs.get(i)) {
+      primes.push(i);
     }
+  }
 
-    return primes;
+  return primes;
 }

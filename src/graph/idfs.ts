@@ -36,19 +36,19 @@ let i: number;
  */
 export function idfs(graph: Graph, source: number,
                      destination: number, log?: Logger): GraphSearchSolution {
-    let solution: GraphSearchSolution = {reachable: false};
+  let solution: GraphSearchSolution = {reachable: false};
 
-    for (i = 0; i < MAX_ITERATION_LIMIT && !solution.reachable; i++) {
-        if (log !== undefined) {
-            log.push({
-                name: 'Iterative DFS - Depth: ' + i,
-                info: {}
-            });
-        }
-        solution = graphSearch(graph, source, destination, pop, push, log);
+  for (i = 0; i < MAX_ITERATION_LIMIT && !solution.reachable; i++) {
+    if (log !== undefined) {
+      log.push({
+        name: 'Iterative DFS - Depth: ' + i,
+        info: {}
+      });
     }
+    solution = graphSearch(graph, source, destination, pop, push, log);
+  }
 
-    return solution;
+  return solution;
 }
 
 /**
@@ -56,7 +56,7 @@ export function idfs(graph: Graph, source: number,
  * @return The next vertex to evaluate.
  */
 function pop(): VertexElement {
-    return this.vertexes.pop();
+  return this.vertexes.pop();
 }
 
 /**
@@ -64,7 +64,7 @@ function pop(): VertexElement {
  * @param e The element to be pushed in vertexes.
  */
 function push(e: VertexElement): void {
-    if (e.depth < i) {
-        this.vertexes.push(e);
-    }
+  if (e.depth < i) {
+    this.vertexes.push(e);
+  }
 }

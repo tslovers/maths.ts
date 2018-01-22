@@ -18,7 +18,7 @@
 import {sieveOfEratosthenes} from './sieve';
 
 export {
-    sieveOfEratosthenes
+  sieveOfEratosthenes
 };
 
 export * from './fundamental';

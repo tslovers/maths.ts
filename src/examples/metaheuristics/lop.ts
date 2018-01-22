@@ -27,159 +27,159 @@ import {BitSet} from 'std.ts';
  * @param wij The matrix of weights for the linear ordering problem.
  */
 export function generateLOP(wij: number[][]): NPProblem<number[]> {
-    for (let i = 0; i < wij.length; i++) {
-        if (wij.length !== wij[i].length) {
-            throw new InputError('The received matrix is not a square matrix');
-        }
+  for (let i = 0; i < wij.length; i++) {
+    if (wij.length !== wij[i].length) {
+      throw new InputError('The received matrix is not a square matrix');
+    }
+  }
+
+  const nodes = wij.length;
+
+  return {
+    solutionValue: solutionValue,
+    generateSolution: generateSolution,
+    generateNeighbors: generateNeighbors,
+    compareSolutions: compareSolutions,
+    crossover: crossover
+  };
+
+  /**
+   * Checks if two solutions are equals.
+   * @param a One solution to compare.
+   * @param b The other solution to compare.
+   */
+  function compareSolutions(a: number[], b: number[]): boolean {
+    if (a.length !== b.length) {
+      return false;
+    }
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Calculates the value of a given solution adding the weights of the
+   * matrix received by this closure.
+   * @param s The solution to get the value.
+   * @returns The value of this solution.
+   */
+  function solutionValue(s: number[]): number {
+    let value = 0;
+
+    for (let i = 0; i < s.length; i++) {
+      for (let j = i + 1; j < s.length; j++) {
+        value += wij[s[i]][s[j]];
+      }
     }
 
-    const nodes = wij.length;
+    return value;
+  }
 
-    return {
-        solutionValue: solutionValue,
-        generateSolution: generateSolution,
-        generateNeighbors: generateNeighbors,
-        compareSolutions: compareSolutions,
-        crossover: crossover
-    };
+  /**
+   * Generates a random solution for Linear Ordering Problem.
+   * @returns A permutation representing the solution for the LOP.
+   */
+  function generateSolution(): number[] {
+    return discrete.randPermutation(nodes);
+  }
 
-    /**
-     * Checks if two solutions are equals.
-     * @param a One solution to compare.
-     * @param b The other solution to compare.
-     */
-    function compareSolutions(a: number[], b: number[]): boolean {
-        if (a.length !== b.length) {
-            return false;
-        }
-        for (let i = 0; i < a.length; i++) {
-            if (a[i] !== b[i]) {
-                return false;
-            }
-        }
-        return true;
+  /**
+   * Generates a number of random neighbor given for the corresponding
+   * solution.
+   * @param curSolution The solution from which is necessary to get some
+   * neighbors.
+   * @param nNeighbors The number of neighbors wanted to be generated.
+   * @param kDiffer The number or proportion in which the solution will
+   * change.
+   * @returns An array of neighbors of cuSolution.
+   */
+  function generateNeighbors(curSolution: number[],
+                             kDiffer: number = 2,
+                             nNeighbors: number = 1): number[][] {
+    const permutations: number[][] = [];
+
+    if (kDiffer > 0 && kDiffer < 1) {
+// If its a proportion calculate the number of times to change this.
+      kDiffer = Math.ceil(curSolution.length * kDiffer);
+    } else if (kDiffer >= 1) {
+// If its an integer calculates the ceil in case the user send a float.
+      kDiffer = Math.ceil(kDiffer);
+    } else {
+// If the user is stupid just go with 2
+      kDiffer = 2;
     }
 
-    /**
-     * Calculates the value of a given solution adding the weights of the
-     * matrix received by this closure.
-     * @param s The solution to get the value.
-     * @returns The value of this solution.
-     */
-    function solutionValue(s: number[]): number {
-        let value = 0;
-
-        for (let i = 0; i < s.length; i++) {
-            for (let j = i + 1; j < s.length; j++) {
-                value += wij[s[i]][s[j]];
-            }
+    while (permutations.length < nNeighbors) {
+      const perm = curSolution.slice();
+      for (let k = 0; k < kDiffer; k++) {
+        let i = 0, j = 0;
+        while (i === j && curSolution.length !== 1) {
+          i = randInt(0, curSolution.length);
+          j = randInt(0, curSolution.length);
         }
-
-        return value;
+        const p = perm[i];
+        perm[i] = perm[j];
+        perm[j] = p;
+      }
+      permutations.push(perm);
     }
 
-    /**
-     * Generates a random solution for Linear Ordering Problem.
-     * @returns A permutation representing the solution for the LOP.
-     */
-    function generateSolution(): number[] {
-        return discrete.randPermutation(nodes);
+    return permutations;
+  }
+
+  function crossover(a: number[],
+                     b: number[],
+                     variation: number = .5): number[][] {
+    const children: number[][] = [];
+// Initializing mask
+    const mask = new BitSet(a.length);
+    const vNumber = Math.ceil(variation * a.length);
+    const aBased: number[] = [],
+      bBased: number[] = [],
+      acBased: number[] = [],
+      bcBased: number[] = [];
+
+    for (let i = 0; i < vNumber; i++) {
+      while (mask.numOn <= i) {
+        const n = randInt(0, a.length);
+        if (!mask.get(n)) {
+          aBased[n] = a[n];
+          bBased[n] = b[n];
+          mask.set(n, true);
+        }
+      }
     }
 
-    /**
-     * Generates a number of random neighbor given for the corresponding
-     * solution.
-     * @param curSolution The solution from which is necessary to get some
-     * neighbors.
-     * @param nNeighbors The number of neighbors wanted to be generated.
-     * @param kDiffer The number or proportion in which the solution will
-     * change.
-     * @returns An array of neighbors of cuSolution.
-     */
-    function generateNeighbors(curSolution: number[],
-                               kDiffer: number = 2,
-                               nNeighbors: number = 1): number[][] {
-        const permutations: number[][] = [];
+    let j = -1;
+// Finds first empty space
+    while (aBased[++j] !== undefined) {}
+    let k = j;
 
-        if (kDiffer > 0 && kDiffer < 1) {
-            // If its a proportion calculate the number of times to change this.
-            kDiffer = Math.ceil(curSolution.length * kDiffer);
-        } else if (kDiffer >= 1) {
-            // If its an integer calculates the ceil in case the user send a float.
-            kDiffer = Math.ceil(kDiffer);
-        } else {
-            // If the user is stupid just go with 2
-            kDiffer = 2;
-        }
-
-        while (permutations.length < nNeighbors) {
-            const perm = curSolution.slice();
-            for (let k = 0; k < kDiffer; k++) {
-                let i = 0, j = 0;
-                while (i === j && curSolution.length !== 1) {
-                    i = randInt(0, curSolution.length);
-                    j = randInt(0, curSolution.length);
-                }
-                const p = perm[i];
-                perm[i] = perm[j];
-                perm[j] = p;
-            }
-            permutations.push(perm);
-        }
-
-        return permutations;
+    let str = '[ ';
+    for (let i = 0; i < mask.size; i++) {
+      if (i !== 0) {
+        str += ', ';
+      }
+      str += mask.get(i) ? '1' : '0';
     }
-
-    function crossover(a: number[],
-                       b: number[],
-                       variation: number = .5): number[][] {
-        const children: number[][] = [];
-        // Initializing mask
-        const mask = new BitSet(a.length);
-        const vNumber = Math.ceil(variation * a.length);
-        const aBased: number[] = [],
-            bBased: number[] = [],
-            acBased: number[] = [],
-            bcBased: number[] = [];
-
-        for (let i = 0; i < vNumber; i++) {
-            while (mask.numOn <= i) {
-                const n = randInt(0, a.length);
-                if (!mask.get(n)) {
-                    aBased[n] = a[n];
-                    bBased[n] = b[n];
-                    mask.set(n, true);
-                }
-            }
-        }
-
-        let j = -1;
-        // Finds first empty space
+    str += ' ]';
+    for (let i = 0; i < a.length; i++) {
+      if (aBased.indexOf(b[i]) === -1) {
+        aBased[j] = b[i];
         while (aBased[++j] !== undefined) {}
-        let k = j;
-
-        let str = '[ ';
-        for (let i = 0; i < mask.size; i++) {
-            if (i !== 0) {
-                str += ', ';
-            }
-            str += mask.get(i) ? '1' : '0';
-        }
-        str += ' ]';
-        for (let i = 0; i < a.length; i++) {
-            if (aBased.indexOf(b[i]) === -1) {
-                aBased[j] = b[i];
-                while (aBased[++j] !== undefined) {}
-            }
-            if (bBased.indexOf(a[i]) === -1) {
-                bBased[k] = a[i];
-                while (bBased[++k] !== undefined) {}
-            }
-        }
-
-        children.push(aBased);
-        children.push(bBased);
-
-        return children;
+      }
+      if (bBased.indexOf(a[i]) === -1) {
+        bBased[k] = a[i];
+        while (bBased[++k] !== undefined) {}
+      }
     }
+
+    children.push(aBased);
+    children.push(bBased);
+
+    return children;
+  }
 }

@@ -55,66 +55,66 @@ export function harmonicSearch<T>(problem: NPProblem<T>,
                                   hmcr: number = 0.7,
                                   kDiffer: number = 2,
                                   maxIt: number = 500): T {
-    // Generates an initial harmonic memory
-    const hMemory: T[] = [];
-    for (let i = 0; i < hms; i++) {
-        hMemory.push(problem.generateSolution());
+// Generates an initial harmonic memory
+  const hMemory: T[] = [];
+  for (let i = 0; i < hms; i++) {
+    hMemory.push(problem.generateSolution());
+  }
+
+  for (let i = 0; i < maxIt; i++) {
+    let is;
+    if (hmcr > Math.random()) {
+      is = problem.generateNeighbors(
+        hMemory[randInt(0, hMemory.length)],
+        kDiffer, // Variation respecting the selected one
+      )[0];
+    } else {
+      is = problem.generateSolution();
     }
 
-    for (let i = 0; i < maxIt; i++) {
-        let is;
-        if (hmcr > Math.random()) {
-            is = problem.generateNeighbors(
-                hMemory[randInt(0, hMemory.length)],
-                kDiffer, // Variation respecting the selected one
-            )[0];
-        } else {
-            is = problem.generateSolution();
-        }
+    const w = findWorst();
+    if (problem.solutionValue(is) >= problem.solutionValue(hMemory[w])) {
+      hMemory[w] = is;
+    }
+  }
 
-        const w = findWorst();
-        if (problem.solutionValue(is) >= problem.solutionValue(hMemory[w])) {
-            hMemory[w] = is;
-        }
+  return hMemory[findBest()];
+
+  /**
+   * Finds the best note in the harmonic memory.
+   * @returns The index of the best solution at memory.
+   */
+  function findBest(): number {
+    let k = -1;
+    let kValue = -Infinity;
+
+    for (let i = 0; i < hMemory.length; i++) {
+      const iValue = problem.solutionValue(hMemory[i]);
+      if (kValue < iValue) {
+        k = i;
+        kValue = iValue;
+      }
     }
 
-    return hMemory[findBest()];
+    return k;
+  }
 
-    /**
-     * Finds the best note in the harmonic memory.
-     * @returns The index of the best solution at memory.
-     */
-    function findBest(): number {
-        let k = -1;
-        let kValue = -Infinity;
+  /**
+   * Finds the worst note in the harmonic memory.
+   * @returns The index of the worst solution at memory.
+   */
+  function findWorst(): number {
+    let k = -1;
+    let kValue = Infinity;
 
-        for (let i = 0; i < hMemory.length; i++) {
-            const iValue = problem.solutionValue(hMemory[i]);
-            if (kValue < iValue) {
-                k = i;
-                kValue = iValue;
-            }
-        }
-
-        return k;
+    for (let i = 0; i < hMemory.length; i++) {
+      const iValue = problem.solutionValue(hMemory[i]);
+      if (kValue > iValue) {
+        k = i;
+        kValue = iValue;
+      }
     }
 
-    /**
-     * Finds the worst note in the harmonic memory.
-     * @returns The index of the worst solution at memory.
-     */
-    function findWorst(): number {
-        let k = -1;
-        let kValue = Infinity;
-
-        for (let i = 0; i < hMemory.length; i++) {
-            const iValue = problem.solutionValue(hMemory[i]);
-            if (kValue > iValue) {
-                k = i;
-                kValue = iValue;
-            }
-        }
-
-        return k;
-    }
+    return k;
+  }
 }

@@ -32,7 +32,7 @@ import {graphSearch, GraphSearchSolution, VertexElement} from './graphSearch';
  */
 export function ucs(graph: Graph, source: number,
                     destination: number, log?: Logger): GraphSearchSolution {
-    return graphSearch(graph, source, destination, shift, push, log);
+  return graphSearch(graph, source, destination, shift, push, log);
 }
 
 /**
@@ -40,7 +40,7 @@ export function ucs(graph: Graph, source: number,
  * @return The next vertex to evaluate.
  */
 function shift(): VertexElement {
-    return this.vertexes.shift();
+  return this.vertexes.shift();
 }
 
 /**
@@ -48,11 +48,11 @@ function shift(): VertexElement {
  * @param e The element to be pushed in vertexes.
  */
 function push(e: VertexElement): void {
-    let i;
-    for (i = 0; i < this.vertexes.length; i++) {
-        if (this.vertexes[i].cost > e.cost) {
-            break;
-        }
+  let i;
+  for (i = 0; i < this.vertexes.length; i++) {
+    if (this.vertexes[i].cost > e.cost) {
+      break;
     }
-    this.vertexes.splice(i, 0, e);
+  }
+  this.vertexes.splice(i, 0, e);
 }

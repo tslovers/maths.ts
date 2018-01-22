@@ -5,16 +5,16 @@ let webpack = require('gulp-webpack');
 let compress = require('gulp-minify');
 let runSeq = require('run-sequence');
 
-let tsProject = ts.createProject('tsconfig.json', {
-    // Changes root dir so a new src folder will not be created on ./lib
-    rootDir: 'src'
-});
-
 gulp.task('default', () => runSeq('ts', 'webpack', 'compress'));
 
 gulp.task('ts', function () {
+    let tsProject = ts.createProject('tsconfig.json', {
+        // Changes root dir so a new src folder will not be created on ./lib
+        rootDir: 'src'
+    });
     let tsResult = tsProject.src().pipe(tsProject());
-    tsResult.dts.pipe(gulp.dest('lib'));
+    // Declaration files
+    tsResult.dts.pipe(gulp.dest('types'));
     return tsResult.js.pipe(gulp.dest('lib'));
 });
 

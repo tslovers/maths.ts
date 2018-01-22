@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import {expect} from 'chai';
 import Matrix from '../../src/structures/Matrix';
+import {expect} from 'chai';
 
 describe('structures::Matrix', () => {
     let matrix2x2 = new Matrix();

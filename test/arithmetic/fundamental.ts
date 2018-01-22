@@ -16,8 +16,8 @@
  */
 
 import {expect} from 'chai';
-import {gcd, lcm} from '../../src/arithmetic';
 import {getRandomNatural} from '../../src/utils/index';
+import {gcd, lcm} from '../../src/arithmetic';
 
 describe('Lattice theory - Laws for GCD & LCM', () => {
     const a = getRandomNatural(2, 1000);

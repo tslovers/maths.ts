@@ -20,10 +20,10 @@ import Vertex from '../structures/Vertex';
 import {Logger} from '../algorithms';
 
 export interface GraphSearchSolution {
-    trail?: string[];
-    cost?: number;
-    depth?: number;
-    reachable: boolean;
+  trail?: string[];
+  cost?: number;
+  depth?: number;
+  reachable: boolean;
 }
 
 /**
@@ -32,11 +32,11 @@ export interface GraphSearchSolution {
  * as the cost and depth for each vertex on list.
  */
 export interface VertexElement {
-    id: number;
-    vertex: Vertex;
-    trail: number[];
-    cost: number;
-    depth: number;
+  id: number;
+  vertex: Vertex;
+  trail: number[];
+  cost: number;
+  depth: number;
 }
 
 /**
@@ -63,21 +63,21 @@ export function graphSearch(graph: Graph, source: number, destination: number,
                             outFunction: () => VertexElement,
                             inFunction: (i: VertexElement) => any,
                             logger?: Logger): GraphSearchSolution {
-    // Initializing list with the source element
-    const list: VertexList = {
-        vertexes: [{
-            vertex: graph.vertexes[source],
-            id: graph.vertexes[source].id,
-            trail: [graph.vertexes[source].id],
-            cost: 0,
-            depth: 0
-        }],
-        status: graph.vertexes.map(() => VertexStatus.NOT_VISITED),
-        push: inFunction,
-        next: outFunction
-    };
+// Initializing list with the source element
+  const list: VertexList = {
+    vertexes: [{
+      vertex: graph.vertexes[source],
+      id: graph.vertexes[source].id,
+      trail: [graph.vertexes[source].id],
+      cost: 0,
+      depth: 0
+    }],
+    status: graph.vertexes.map(() => VertexStatus.NOT_VISITED),
+    push: inFunction,
+    next: outFunction
+  };
 
-    return gs(list, destination, logger);
+  return gs(list, destination, logger);
 }
 
 /**
@@ -86,10 +86,10 @@ export function graphSearch(graph: Graph, source: number, destination: number,
  * their respective algorithms; e.g. bfs sends Array.shift as next function.
  */
 interface VertexList {
-    vertexes: VertexElement[];
-    status: VertexStatus[];
-    push: (n: VertexElement) => any;
-    next: () => VertexElement;
+  vertexes: VertexElement[];
+  status: VertexStatus[];
+  push: (n: VertexElement) => any;
+  next: () => VertexElement;
 }
 
 /**
@@ -97,9 +97,9 @@ interface VertexList {
  * VertexElement and graphSearch.
  */
 enum VertexStatus {
-    NOT_VISITED,
-    IN_QUEUE,
-    VISITED
+  NOT_VISITED,
+  IN_QUEUE,
+  VISITED
 }
 
 /**
@@ -115,86 +115,86 @@ enum VertexStatus {
  */
 function gs(list: VertexList, destination: number,
             logger: Logger): GraphSearchSolution {
+  if (logger) {
+    logger.push({
+      name: 'Starting search of ' + destination + ' from ' +
+      list.vertexes[0].vertex.id,
+      info: {idVertexList: getInfo(list)}
+    });
+  }
+
+// Until there is no more elements on list.
+  while (list.vertexes.length) {
+    const v = list.next();
+    list.status[v.id] = VertexStatus.VISITED; // Update status for this node
     if (logger) {
+      logger.push({
+        name: 'Current node: ' + v.id + (v.id === destination ?
+          ' -> its goal!' : ''),
+        info: {
+          addedVertexes: [],
+          ignoredVertexes: []
+        }
+      });
+    }
+
+// Wuu! Found!
+    if (v.id === destination) {
+      if (logger) {
+        logger[logger.length - 1].info.idVertexList = getInfo(list);
         logger.push({
-            name: 'Starting search of ' + destination + ' from ' +
-            list.vertexes[0].vertex.id,
-            info: {idVertexList: getInfo(list)}
+          name: 'GraphSearchSolution',
+          info: {
+            trail: v.trail,
+            cost: v.cost,
+            depth: v.depth
+          }
         });
+      }
+      return {
+        trail: v.trail.map(i => i + ''),
+        cost: v.cost,
+        depth: v.depth,
+        reachable: true
+      };
     }
 
-    // Until there is no more elements on list.
-    while (list.vertexes.length) {
-        const v = list.next();
-        list.status[v.id] = VertexStatus.VISITED; // Update status for this node
+    v.vertex.edges.forEach(e => {
+// Add all vertex on neighborhood if they have not been visited
+      if (list.status[e.destination.id] !== VertexStatus.VISITED) {
+// Update status
+        list.status[e.destination.id] = VertexStatus.IN_QUEUE;
         if (logger) {
-            logger.push({
-                name: 'Current node: ' + v.id + (v.id === destination ?
-                    ' -> its goal!' : ''),
-                info: {
-                    addedVertexes: [],
-                    ignoredVertexes: []
-                }
-            });
+          logger[logger.length - 1].info
+            .addedVertexes.push(e.destination.id);
         }
 
-        // Wuu! Found!
-        if (v.id === destination) {
-            if (logger) {
-                logger[logger.length - 1].info.idVertexList = getInfo(list);
-                logger.push({
-                    name: 'GraphSearchSolution',
-                    info: {
-                        trail: v.trail,
-                        cost: v.cost,
-                        depth: v.depth
-                    }
-                });
-            }
-            return {
-                trail: v.trail.map(i => i + ''),
-                cost: v.cost,
-                depth: v.depth,
-                reachable: true
-            };
-        }
+// Copy trail
+        const trail = v.trail.slice();
+// Add this as new element on trail
+        trail.push(e.destination.id);
 
-        v.vertex.edges.forEach(e => {
-            // Add all vertex on neighborhood if they have not been visited
-            if (list.status[e.destination.id] !== VertexStatus.VISITED) {
-                // Update status
-                list.status[e.destination.id] = VertexStatus.IN_QUEUE;
-                if (logger) {
-                    logger[logger.length - 1].info
-                        .addedVertexes.push(e.destination.id);
-                }
-
-                // Copy trail
-                const trail = v.trail.slice();
-                // Add this as new element on trail
-                trail.push(e.destination.id);
-
-                list.push({
-                    vertex: e.destination,
-                    id: e.destination.id,
-                    trail: trail,
-                    cost: v.cost + e.weight,
-                    depth: v.depth + 1
-                });
-            } else if (logger) {
-                logger[logger.length - 1].info
-                    .ignoredVertexes.push(e.destination.id);
-            }
+        list.push({
+          vertex: e.destination,
+          id: e.destination.id,
+          trail: trail,
+          cost: v.cost + e.weight,
+          depth: v.depth + 1
         });
+      } else if (logger) {
+        logger[logger.length - 1].info
+          .ignoredVertexes.push(e.destination.id);
+      }
+    });
 
-        if (logger) {
-            logger[logger.length - 1].info.idVertexList = getInfo(list);
-        }
+    if (logger) {
+      logger[logger.length - 1].info.idVertexList = getInfo(list);
     }
+  }
 
-    return {
-        reachable: false
-    };
+  return {
+    reachable: false
+  };
 }
 
 /**
@@ -203,12 +203,12 @@ function gs(list: VertexList, destination: number,
  * @return Information about the current state of the list.
  */
 function getInfo(list: VertexList): any {
-    return list.vertexes.map(i => {
-        return {
-            id: i.id,
-            trail: i.trail.map(e => e), // Copying it
-            cost: i.cost,
-            depth: i.depth
-        };
-    });
+  return list.vertexes.map(i => {
+    return {
+      id: i.id,
+      trail: i.trail.map(e => e), // Copying it
+      cost: i.cost,
+      depth: i.depth
+    };
+  });
 }

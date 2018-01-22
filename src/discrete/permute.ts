@@ -24,8 +24,8 @@ import {randInt} from './integers';
  * @returns An array with perms permutations of arr.
  */
 export function permute<T>(arr: T[], perms: number): T[][] {
-    // TODO function*?
-    return [];
+// TODO function*?
+  return [];
 }
 
 /**
@@ -37,21 +37,21 @@ export function permute<T>(arr: T[], perms: number): T[][] {
  * @returns An array with perms permutations of arr.
  */
 export function randPermute<T>(arr: T[], perms?: number): T[][] {
-    const permutations: T[][] = [];
+  const permutations: T[][] = [];
 
-    while (permutations.length < perms) {
-        let i = 0, j = 0;
-        const perm = arr.slice();
-        while (i === j && arr.length !== 1) {
-            i = randInt(0, arr.length);
-            j = randInt(0, arr.length);
-        }
-        perm[i] = arr[j];
-        perm[j] = arr[i];
-        permutations.push(perm);
+  while (permutations.length < perms) {
+    let i = 0, j = 0;
+    const perm = arr.slice();
+    while (i === j && arr.length !== 1) {
+      i = randInt(0, arr.length);
+      j = randInt(0, arr.length);
     }
+    perm[i] = arr[j];
+    perm[j] = arr[i];
+    permutations.push(perm);
+  }
 
-    return permutations;
+  return permutations;
 }
 
 /**
@@ -59,20 +59,20 @@ export function randPermute<T>(arr: T[], perms?: number): T[][] {
  * @param n The size of the array.
  */
 export function randPermutation(n: number): number[] {
-    const perm: number[] = [];
+  const perm: number[] = [];
 
-    for (let i = 0; i < n; i++) {
-        perm.push(i);
-    }
+  for (let i = 0; i < n; i++) {
+    perm.push(i);
+  }
 
-    n = n * n;
-    for (let i = 0; i < n; i++) {
-        const a = randInt(0, perm.length),
-            b = randInt(0, perm.length);
-        const aux: number = perm[a];
-        perm[a] = perm[b];
-        perm[b] = aux;
-    }
+  n = n * n;
+  for (let i = 0; i < n; i++) {
+    const a = randInt(0, perm.length),
+      b = randInt(0, perm.length);
+    const aux: number = perm[a];
+    perm[a] = perm[b];
+    perm[b] = aux;
+  }
 
-    return perm;
+  return perm;
 }

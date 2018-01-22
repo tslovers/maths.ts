@@ -32,22 +32,22 @@ import {graphSearch, GraphSearchSolution, VertexElement} from './graphSearch';
  */
 export function greedySearch(graph: Graph, source: number, destination: number,
                              log?: Logger): GraphSearchSolution {
-    return graphSearch(graph, source, destination, shift, push, log);
+  return graphSearch(graph, source, destination, shift, push, log);
 
-    /**
-     * Pushes an element to the list vertexes.
-     * @param e The element to be pushed in vertexes.
-     */
-    function push(e: VertexElement): void {
-        let i;
-        for (i = 0; i < this.vertexes.length; i++) {
-            if (graph.heuristicValue(this.vertexes[i].id, destination) >
-                graph.heuristicValue(e.id, destination)) {
-                break;
-            }
-        }
-        this.vertexes.splice(i, 0, e);
+  /**
+   * Pushes an element to the list vertexes.
+   * @param e The element to be pushed in vertexes.
+   */
+  function push(e: VertexElement): void {
+    let i;
+    for (i = 0; i < this.vertexes.length; i++) {
+      if (graph.heuristicValue(this.vertexes[i].id, destination) >
+        graph.heuristicValue(e.id, destination)) {
+        break;
+      }
     }
+    this.vertexes.splice(i, 0, e);
+  }
 }
 
 /**
@@ -55,5 +55,5 @@ export function greedySearch(graph: Graph, source: number, destination: number,
  * @return The next vertex to evaluate.
  */
 function shift(): VertexElement {
-    return this.vertexes.shift();
+  return this.vertexes.shift();
 }

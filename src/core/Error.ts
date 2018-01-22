@@ -16,18 +16,18 @@
  */
 
 export interface InputErrorInfo {
-    input: string;
-    message: string;
+  input: string;
+  message: string;
 }
 
 export class InputError extends Error {
-    private input: string;
+  private input: string;
 
-    constructor(error: string | InputErrorInfo) {
-        if (typeof error === 'string') {
-            super(error);
-        } else {
-            super(error.message + ' -- at: ' + error.input);
-        }
+  constructor(error: string | InputErrorInfo) {
+    if (typeof error === 'string') {
+      super(error);
+    } else {
+      super(error.message + ' -- at: ' + error.input);
     }
+  }
 }

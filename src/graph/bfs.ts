@@ -32,7 +32,7 @@ import {graphSearch, GraphSearchSolution, VertexElement} from './graphSearch';
  */
 export function bfs(graph: Graph, source: number, destination: number,
                     log?: Logger): GraphSearchSolution {
-    return graphSearch(graph, source, destination, shift, push, log);
+  return graphSearch(graph, source, destination, shift, push, log);
 }
 
 /**
@@ -40,7 +40,7 @@ export function bfs(graph: Graph, source: number, destination: number,
  * @return The next vertex to evaluate.
  */
 function shift(): VertexElement {
-    return this.vertexes.shift();
+  return this.vertexes.shift();
 }
 
 /**
@@ -48,5 +48,5 @@ function shift(): VertexElement {
  * @param i The element to be pushed in vertexes.
  */
 function push(i: VertexElement): void {
-    this.vertexes.push(i);
+  this.vertexes.push(i);
 }

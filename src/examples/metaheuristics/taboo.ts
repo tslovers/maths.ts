@@ -32,85 +32,85 @@ const tabooListSize = [5, 15, 25];
 const neighborhoodDiversity = [0.05, 0.1, 0.15];
 
 fs.readFile(filename, 'utf8', (err, data: string) => {
-    if (err) {
-        console.error('An error occurred', err);
-        return;
+  if (err) {
+    console.error('An error occurred', err);
+    return;
+  }
+
+  const formattedData = data.split(/[\n ]/);
+  const n = Number(formattedData.shift());
+  const dataset = [];
+  for (let i = 0; i < n; i++) {
+    dataset.push([]);
+    for (let j = 0; j < n; j++) {
+      dataset[i].push(Number(formattedData.shift()));
     }
+  }
 
-    const formattedData = data.split(/[\n ]/);
-    const n = Number(formattedData.shift());
-    const dataset = [];
-    for (let i = 0; i < n; i++) {
-        dataset.push([]);
-        for (let j = 0; j < n; j++) {
-            dataset[i].push(Number(formattedData.shift()));
-        }
-    }
+  console.log('Problem: ' + problemName);
+  const lop = generateLOP(dataset);
+  const report: any[][] = [
+    ['Param', 'tMin', 'tMax', 'tAvg', 'hMin', 'hMax', 'hAvg']
+  ];
+  let gTime = +new Date();
+  iterations.forEach(t => {
+    neighborhoodDiversity.forEach(nv => {
+      neighborhoodSize.forEach(ns => {
+        tabooListSize.forEach(tls => {
+          report.push([
+            'it:' + t + '|nv:' + nv + '|ns:' + ns + '|tls:' + tls,
+            Infinity,
+            0,
+            0,
+            Infinity,
+            0,
+            0
+          ]);
+// Checks the iteration number
+          const it = report.length - 1;
+          for (let i = 0; i < reps; i++) {
+// To check time later
+            let time = +new Date();
+// Generate solution
+            const s = tabooSearch(lop, ns, nv, tls, t);
+            const h = lop.solutionValue(s);
+// Time spent
+            time = +new Date() - time;
 
-    console.log('Problem: ' + problemName);
-    const lop = generateLOP(dataset);
-    const report: any[][] = [
-        ['Param', 'tMin', 'tMax', 'tAvg', 'hMin', 'hMax', 'hAvg']
-    ];
-    let gTime = +new Date();
-    iterations.forEach(t => {
-        neighborhoodDiversity.forEach(nv => {
-            neighborhoodSize.forEach(ns => {
-                tabooListSize.forEach(tls => {
-                    report.push([
-                        'it:' + t + '|nv:' + nv + '|ns:' + ns + '|tls:' + tls,
-                        Infinity,
-                        0,
-                        0,
-                        Infinity,
-                        0,
-                        0
-                    ]);
-                    // Checks the iteration number
-                    const it = report.length - 1;
-                    for (let i = 0; i < reps; i++) {
-                        // To check time later
-                        let time = +new Date();
-                        // Generate solution
-                        const s = tabooSearch(lop, ns, nv, tls, t);
-                        const h = lop.solutionValue(s);
-                        // Time spent
-                        time = +new Date() - time;
+            report[it][6] += h;
+            report[it][3] += time;
 
-                        report[it][6] += h;
-                        report[it][3] += time;
-
-                        if (report[it][1] > time) {
-                            report[it][1] = time;
-                        }
-                        if (report[it][2] < time) {
-                            report[it][2] = time;
-                        }
-                        if (report[it][4] > h) {
-                            report[it][4] = h;
-                        }
-                        if (report[it][5] < h) {
-                            report[it][5] = h;
-                        }
-                    }
-                    report[it][6] = Math.round(report[it][6] / reps);
-                    report[it][3] = Math.round(report[it][3] / reps);
-                });
-            });
+            if (report[it][1] > time) {
+              report[it][1] = time;
+            }
+            if (report[it][2] < time) {
+              report[it][2] = time;
+            }
+            if (report[it][4] > h) {
+              report[it][4] = h;
+            }
+            if (report[it][5] < h) {
+              report[it][5] = h;
+            }
+          }
+          report[it][6] = Math.round(report[it][6] / reps);
+          report[it][3] = Math.round(report[it][3] / reps);
         });
+      });
     });
-    gTime = +new Date() - gTime;
-    console.log('Total time: ' + gTime);
-    console.log(table(report));
+  });
+  gTime = +new Date() - gTime;
+  console.log('Total time: ' + gTime);
+  console.log(table(report));
 
-    let csvData = '';
-    report.forEach(r => csvData += r.join(',') + '\n');
-    const reportFile = problemName + '.TSReport.csv';
-    fs.writeFile(reportFile, csvData, er => {
-        if (er) {
-            console.error('Something occurred while saving the report.');
-        } else {
-            console.log('Report saved at ' + reportFile);
-        }
-    });
+  let csvData = '';
+  report.forEach(r => csvData += r.join(',') + '\n');
+  const reportFile = problemName + '.TSReport.csv';
+  fs.writeFile(reportFile, csvData, er => {
+    if (er) {
+      console.error('Something occurred while saving the report.');
+    } else {
+      console.log('Report saved at ' + reportFile);
+    }
+  });
 });

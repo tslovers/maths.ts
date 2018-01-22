@@ -28,9 +28,9 @@ export * from './aStar';
 export * from './greedy';
 
 export {
-    Graph,
-    Vertex,
-    Edge
+  Graph,
+  Vertex,
+  Edge
 };
 // TODO: Flow algorithms
 

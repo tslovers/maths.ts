@@ -21,8 +21,8 @@ import Edge from './Edge';
 import Matrix from './Matrix';
 
 export {
-    Edge,
-    Graph,
-    Matrix,
-    Vertex
+  Edge,
+  Graph,
+  Matrix,
+  Vertex
 };

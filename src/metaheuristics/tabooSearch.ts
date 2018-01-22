@@ -37,51 +37,51 @@ export function tabooSearch<T>(problem: NPProblem<T>,
                                kDiffer: number = 2,
                                tlSize: number = 30,
                                iterations: number = 100): T {
-    // Generates an initial solution
-    const sol = problem.generateSolution();
-    const tabooList: T[] = [];
-    let bestS = sol;
-    debug('Initial sol: ' + bestS);
-    let bestVal = problem.solutionValue(bestS);
-    for (let i = 0; i < iterations; i++) {
-        const neighbors = problem.generateNeighbors(sol, kDiffer, nNeighbors);
-        const candidates: T[] = [];
-        neighbors.forEach(n => {
-            debug('%s=%d', '' + n, problem.solutionValue(n));
-            if (!isIn(n, tabooList)) {
-                candidates.push(n);
-            }
-        });
-        let bestC: T = candidates[0];
-        let bestCVal = 0;
-        candidates.forEach(c => {
-            const cVal = problem.solutionValue(c);
-            if (cVal > bestCVal) {
-                bestCVal = cVal;
-                bestC = c;
-            }
-        });
-        debug('Picked: %s=%d', '' + bestC, bestCVal);
-        if (bestCVal > bestVal) {
-            debug('Solution updated to ' + bestC);
-            bestS = bestC;
-            bestVal = bestCVal;
-            tabooList.unshift(bestC);
-            if (tabooList.length >= tlSize) {
-                tabooList.pop();
-            }
-        }
+// Generates an initial solution
+  const sol = problem.generateSolution();
+  const tabooList: T[] = [];
+  let bestS = sol;
+  debug('Initial sol: ' + bestS);
+  let bestVal = problem.solutionValue(bestS);
+  for (let i = 0; i < iterations; i++) {
+    const neighbors = problem.generateNeighbors(sol, kDiffer, nNeighbors);
+    const candidates: T[] = [];
+    neighbors.forEach(n => {
+      debug('%s=%d', '' + n, problem.solutionValue(n));
+      if (!isIn(n, tabooList)) {
+        candidates.push(n);
+      }
+    });
+    let bestC: T = candidates[0];
+    let bestCVal = 0;
+    candidates.forEach(c => {
+      const cVal = problem.solutionValue(c);
+      if (cVal > bestCVal) {
+        bestCVal = cVal;
+        bestC = c;
+      }
+    });
+    debug('Picked: %s=%d', '' + bestC, bestCVal);
+    if (bestCVal > bestVal) {
+      debug('Solution updated to ' + bestC);
+      bestS = bestC;
+      bestVal = bestCVal;
+      tabooList.unshift(bestC);
+      if (tabooList.length >= tlSize) {
+        tabooList.pop();
+      }
     }
-    debug(tabooList);
+  }
+  debug(tabooList);
 
-    return bestS;
+  return bestS;
 
-    function isIn(e: T, array: T[]): boolean {
-        for (let i = 0; i < array.length; i++) {
-            if (problem.compareSolutions(array[i], e)) {
-                return true;
-            }
-        }
-        return false;
+  function isIn(e: T, array: T[]): boolean {
+    for (let i = 0; i < array.length; i++) {
+      if (problem.compareSolutions(array[i], e)) {
+        return true;
+      }
     }
+    return false;
+  }
 }

@@ -24,11 +24,11 @@ export * from './mergeSort';
  * steps in some algorithms then Log may be used to store it.
  */
 export interface Log {
-    name: string;
-    info?: any;
-    htmlRepresentation?: HTMLElement;
-    stringRepresentation?: string;
-    representation?: any;
+  name: string;
+  info?: any;
+  htmlRepresentation?: HTMLElement;
+  stringRepresentation?: string;
+  representation?: any;
 }
 
 export type Logger = Log[];

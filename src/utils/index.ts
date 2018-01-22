@@ -23,7 +23,7 @@
  */
 export function getRandomNatural(lowerBound: number,
                                  upperBound: number): number {
-    return Math.floor(getRandomNumber(lowerBound, upperBound));
+  return Math.floor(getRandomNumber(lowerBound, upperBound));
 }
 
 /**
@@ -34,6 +34,6 @@ export function getRandomNatural(lowerBound: number,
  */
 export function getRandomNumber(lowerBound: number,
                                 upperBound: number): number {
-    return Math.floor(Math.random() * (upperBound - lowerBound + 1))
-        + lowerBound;
+  return Math.floor(Math.random() * (upperBound - lowerBound + 1))
+    + lowerBound;
 }

@@ -20,16 +20,15 @@ import * as structures from './structures';
 import * as arithmetic from './arithmetic';
 import * as discrete from './discrete';
 import * as graph from './graph';
-// import * as plotter from './plotter';
-// import * as util from './utils';
+
 export {
-    arithmetic,
-    discrete,
-    graph,
-    metaheuristics,
-    // plotter,
-    structures
-    // util
+  arithmetic,
+  discrete,
+  graph,
+  metaheuristics,
+  // plotter,
+  structures
+  // util
 };
 
 export * from './algorithms';

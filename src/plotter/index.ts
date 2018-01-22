@@ -19,6 +19,6 @@
  * Represents a coordinate. This will be used in plots, grids, matrix, etc.
  */
 export interface Coordinate {
-    x: number;
-    y: number;
+  x: number;
+  y: number;
 }

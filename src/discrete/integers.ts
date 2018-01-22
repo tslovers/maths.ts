@@ -22,7 +22,7 @@
  * @returns A random integer between lb and ub.
  */
 export function randInt(lb: number, ub: number): number {
-    return Math.floor(Math.random() * (ub - lb)) + lb;
+  return Math.floor(Math.random() * (ub - lb)) + lb;
 }
 
 /**
@@ -31,11 +31,11 @@ export function randInt(lb: number, ub: number): number {
  * @returns n!
  */
 export function factorial(n: number): number {
-    let a = 1;
+  let a = 1;
 
-    for (let i = 2; i <= n; i++) {
-        a *= i;
-    }
+  for (let i = 2; i <= n; i++) {
+    a *= i;
+  }
 
-    return a;
+  return a;
 }

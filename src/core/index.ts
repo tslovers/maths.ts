@@ -24,9 +24,9 @@ import Node from './Node';
  * @return A Node object containing the value of the expression.
  */
 export function evaluate(exp: string): Node {
-    return new Node(exp);
+  return new Node(exp);
 }
 
 export {
-    Node as Expression
+  Node as Expression
 };

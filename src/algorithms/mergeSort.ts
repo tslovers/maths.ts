@@ -16,7 +16,6 @@
  */
 
 import {ascending, criterion} from '../utils/comparisons';
-import {Logger} from './index';
 
 /**
  * Executes the merge sort algorithm. When a logger its sent, it describes
@@ -31,51 +30,9 @@ import {Logger} from './index';
  * be described in each log.
  * @return The sorted array.
  */
-export function mergeSort<T>(a: T[], compare: criterion = ascending,
-                             logger?: Logger): T[] {
-    if (logger !== undefined) {
-        loggedMSort(a, 0, a.length, compare, logger);
-    } else {
-        mSort(a, 0, a.length, compare);
-    }
-
-    return a;
-}
-
-/**
- * The actual merge sort algorithm. Splits by two equal parts the array in each
- * recursion until it gets to arrays with only one elements, then orderly
- * joins them. Additionally, it logs each name of the execution in a logger.
- * @param a The array containing the elements to sort.
- * @param p The index of the first element to sort.
- * @param r The index of the last element to sort.
- * @param compare The comparative criterion.
- * @param logger The logger holding each name of this algorithm.
- */
-function loggedMSort<T>(a: T[], p: number, r: number, compare: criterion,
-                        logger: Logger): void {
-    if ((r - p) > 1) {
-        const q: number = Math.floor((p + r) / 2);
-
-        // Inform about this recursion opening
-        logger.push({
-            name: 'A[' + p + '-' + r + '] split into A[' + p + '-' + q +
-            '] and [' + q + '-' + r + ']',
-            stringRepresentation: '[' + a.slice(p, r).join(', ') + '] to ' +
-            '[' + a.slice(p, q).join(', ') + '] and ' + '[' +
-            a.slice(q, r).join(', ') + ']',
-        });
-
-        loggedMSort(a, p, q, compare, logger);
-        loggedMSort(a, q, r, compare, logger);
-        merge(a, p, q, r, compare);
-
-        // Inform about this recursion ending
-        logger.push({
-            name: 'A[' + p + '-' + r + '] merged & sorted',
-            stringRepresentation: '[' + a.slice(p, r).join(', ') + ']'
-        });
-    }
+export function mergeSort<T>(a: T[], compare: criterion = ascending): T[] {
+  mSort(a, 0, a.length, compare);
+  return a;
 }
 
 /**
@@ -88,17 +45,17 @@ function loggedMSort<T>(a: T[], p: number, r: number, compare: criterion,
  * @param compare The comparative criterion.
  */
 function mSort<T>(a: T[], p: number, r: number, compare: criterion): void {
-    // Ends when there are only 1 elements to evaluate
-    if ((r - p) > 1) {
-        // Gets the center of the array
-        const q: number = Math.floor((p + r) / 2);
-        // Merge sort the first half of this collection
-        mSort(a, p, q, compare);
-        // Merge sort the last half of this collection
-        mSort(a, q, r, compare);
-        // Merges and sorts the two parts of the array
-        merge(a, p, q, r, compare);
-    }
+// Ends when there are only 1 elements to evaluate
+  if ((r - p) > 1) {
+// Gets the center of the array
+    const q: number = Math.floor((p + r) / 2);
+// Merge sort the first half of this collection
+    mSort(a, p, q, compare);
+// Merge sort the last half of this collection
+    mSort(a, q, r, compare);
+// Merges and sorts the two parts of the array
+    merge(a, p, q, r, compare);
+  }
 }
 
 /**
@@ -112,18 +69,18 @@ function mSort<T>(a: T[], p: number, r: number, compare: criterion): void {
  */
 function merge<T>(a: T[], p: number, q: number, r: number,
                   compare: criterion): void {
-    let i: number;
-    let j: number;
-    const l1: T[] = a.slice(p, q); // Copy the first half
-    const l2: T[] = a.slice(q, r); // Copy the last half
+  let i: number;
+  let j: number;
+  const l1: T[] = a.slice(p, q); // Copy the first half
+  const l2: T[] = a.slice(q, r); // Copy the last half
 
-    i = j = 0;
-    // Orders from p to q
-    for (let k = p; k < r; k++) {
-        if (compare(l1[i], l2[j]) < 0 && l1.length !== i) {
-            a[k] = l1[i++];
-        } else {
-            a[k] = l2[j++];
-        }
+  i = j = 0;
+// Orders from p to q
+  for (let k = p; k < r; k++) {
+    if (compare(l1[i], l2[j]) < 0 && l1.length !== i) {
+      a[k] = l1[i++];
+    } else {
+      a[k] = l2[j++];
     }
+  }
 }

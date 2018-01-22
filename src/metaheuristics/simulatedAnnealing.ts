@@ -43,46 +43,46 @@ export function simulatedAnnealing<T>(problem: NPProblem<T>,
                                       t0: number = 100, tf: number = 0,
                                       tDecrease: (t: number) => number = decrease,
                                       sRepetitions: number = 5): T {
-    // Generates an initial solution
-    let solution = problem.generateSolution();
-    // Calculates the 'energy' of the initial solution
-    let sEnergy = problem.solutionValue(solution);
-    let k = 0;
+// Generates an initial solution
+  let solution = problem.generateSolution();
+// Calculates the 'energy' of the initial solution
+  let sEnergy = problem.solutionValue(solution);
+  let k = 0;
 
-    for (let t = t0; t > tf;) {
-        // Generates nNeighbor candidates solutions from the neighborhood of
-        // s, then picks one.
-        const cSolution = problem
-            .generateNeighbors(solution, kDiffer, nNeighbors)[randInt(0, nNeighbors)];
-        // Calculates 'energy' of candidate solution
-        const csEnergy = problem.solutionValue(cSolution);
-        // Calculates the difference between 'energies'
-        const AE = sEnergy - csEnergy;
-        // Informative, only when debugging
-        debug('Temperature = ' + t, 'e^(AE/t) = ' + Math.exp(AE / t));
-        debug('curS: ' + solution, 'canS: ' + cSolution);
-        debug('curS value: ' + sEnergy, 'canS value: ' + csEnergy);
-        if (AE < 0) {
-            // If candidate solution is a better solution update
-            solution = cSolution;
-            sEnergy = csEnergy;
-            debug('Update, better solution!');
-        } else if (Math.random() >= Math.exp(AE / t)) {
-            // If candidate solution is not a better solution but the
-            // temperature is high enough then update
-            solution = cSolution;
-            sEnergy = csEnergy;
-            debug('Update, high enough temperature!');
-            t = tDecrease(t);
-        } else if (k++ === sRepetitions) {
-            k = 0;
-            t = tDecrease(t);
-        }
+  for (let t = t0; t > tf;) {
+// Generates nNeighbor candidates solutions from the neighborhood of
+// s, then picks one.
+    const cSolution = problem
+      .generateNeighbors(solution, kDiffer, nNeighbors)[randInt(0, nNeighbors)];
+// Calculates 'energy' of candidate solution
+    const csEnergy = problem.solutionValue(cSolution);
+// Calculates the difference between 'energies'
+    const AE = sEnergy - csEnergy;
+// Informative, only when debugging
+    debug('Temperature = ' + t, 'e^(AE/t) = ' + Math.exp(AE / t));
+    debug('curS: ' + solution, 'canS: ' + cSolution);
+    debug('curS value: ' + sEnergy, 'canS value: ' + csEnergy);
+    if (AE < 0) {
+// If candidate solution is a better solution update
+      solution = cSolution;
+      sEnergy = csEnergy;
+      debug('Update, better solution!');
+    } else if (Math.random() >= Math.exp(AE / t)) {
+// If candidate solution is not a better solution but the
+// temperature is high enough then update
+      solution = cSolution;
+      sEnergy = csEnergy;
+      debug('Update, high enough temperature!');
+      t = tDecrease(t);
+    } else if (k++ === sRepetitions) {
+      k = 0;
+      t = tDecrease(t);
     }
+  }
 
-    return solution;
+  return solution;
 }
 
 function decrease(t: number): number {
-    return t - .1;
+  return t - .1;
 }

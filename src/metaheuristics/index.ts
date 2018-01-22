@@ -25,10 +25,10 @@ export * from './tabooSearch';
  * solution the algorithm will use.
  */
 export interface NPProblem<T> {
-    solutionValue: (s: T) => number;
-    generateSolution: () => any;
-    compareSolutions: (a: T, b: T) => boolean;
-    generateNeighbors: (s: T, kDiffer?: number, nNeighbors?: number) => T[];
-    crossover: (a: T, b: T, variation?: number) => T[];
-    description?: any;
+  solutionValue: (s: T) => number;
+  generateSolution: () => any;
+  compareSolutions: (a: T, b: T) => boolean;
+  generateNeighbors: (s: T, kDiffer?: number, nNeighbors?: number) => T[];
+  crossover: (a: T, b: T, variation?: number) => T[];
+  description?: any;
 }

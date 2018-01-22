@@ -4,9 +4,7 @@
 # Node files
 node_modules
 .tscache
-# Library files, unneeded in development 'cause they can be generated with grunt
-# include or not include?
+# Library files, unneeded in development 'cause they can be generated with gulp
 lib
-# include or not include?
+types
 bundle
-package-lock.json

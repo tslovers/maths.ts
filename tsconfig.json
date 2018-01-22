@@ -1,15 +1,15 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": ".",
-    "target": "es2015",
-    "module": "commonjs",
     "declaration": true,
-    "sourceMap": true,
-    "removeComments": false,
-    "preserveConstEnums": true,
+    "module": "commonjs",
     "noImplicitAny": true,
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "preserveConstEnums": true,
+    "removeComments": false,
+    "rootDir": ".",
+    "sourceMap": true,
+    "target": "es2015"
   },
   "files": [
     "./src/**/*.ts"

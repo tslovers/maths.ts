@@ -17,7 +17,7 @@ Please help us by doing the following steps before logging an issue:
 <!-- If you have a BUG or SUGGESTION:
   Please fill in the *entire* template below.
 -->
-**std.ts Version:**  X.Y.Z
+**maths.ts Version:**  X.Y.Z
 
 <!-- Search terms you tried before logging this (so others can find this issue more easily) -->
 **Search Terms:** 
@@ -27,7 +27,7 @@ Please help us by doing the following steps before logging an issue:
 ```ts
 // An example of what is missing
 // Also it will be great if you test with tsc instead of any other tool
-import * as std from 'std.ts';
+import * as maths from 'maths.ts';
 
 ```
 

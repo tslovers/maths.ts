@@ -1,10 +1,10 @@
-[![Version](https://img.shields.io/npm/v/maths.ts.svg)](https://www.npmjs.com/package/maths.ts)
-[![Downloads](https://img.shields.io/npm/dm/maths.ts.svg)](https://www.npmjs.com/package/maths.ts)
-[![Build Status](https://img.shields.io/travis/IpiVasquez/maths.ts.svg)](https://travis-ci.org/IpiVasquez/maths.ts)
-![Maintenance](https://img.shields.io/maintenance/yes/2018.svg)
-[![License](https://img.shields.io/github/license/IpiVasquez/maths.ts.svg)](https://github.com/IpiVasquez/maths.ts/blob/master/LICENSE)
-
+[![Build Status][travis-image]][travis-url]
+[![Version][npm-image]][npm-url]
+[![Downloads][npm-downloads-image]][npm-url]
+![Maintenance][maintain-image]
+[![License][license-image]][license-url]
 # maths.ts
+
 ## A very extensive library for doing maths!
 Maths.ts is a very extensive library for doing maths in TypeScript,
 JavaScript and Node.js. It is written in TypeScript looking for a strong
@@ -62,7 +62,7 @@ a.multiply(4); // maths.ts obj {24}
 ```
     
 Please use brackets to avoid ambiguities like 2^3^4. 2^3^4 may be interpreted
- as 2^(3^4) as well as (2^3)^4, throwing two different results.
+as 2^(3^4) as well as (2^3)^4, throwing two different results.
 
 ## Browser support
 At this time it is not available on a CDN. So in order to use it in browser it
@@ -93,3 +93,15 @@ There are many ways to [contribute](https://github.com/IpiVasquez/maths.ts/blob/
 * Contribute bugs fixes.
 
 This project has adopted the [Contributor Covenant Code of Conduct](https://github.com/IpiVasquez/maths.ts/blob/master/CODE_OF_CONDUCT.md).
+
+[npm-image]: https://img.shields.io/npm/v/maths.ts.svg
+[npm-downloads-image]: https://img.shields.io/npm/dm/maths.ts.svg
+[npm-url]: https://www.npmjs.com/package/maths.ts
+
+[travis-image]: https://img.shields.io/travis/tslovers/maths.ts.svg
+[travis-url]: https://travis-ci.org/tslovers/maths.ts
+
+[maintain-image]: https://img.shields.io/maintenance/yes/2018.svg
+
+[license-image]: https://img.shields.io/github/license/tslovers/maths.ts.svg
+[license-url]: https://github.com/tslovers/maths.ts/blob/master/LICENSE

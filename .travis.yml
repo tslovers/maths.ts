@@ -3,3 +3,12 @@ node_js:
 - '7.10'
 script:
 - npm test
+deploy:
+  provider: npm
+  email: ipi.vasquez@gmail.com
+  skip_cleanup: true
+  api_key:
+    secure: hl6vawppNwq5qd4YGUWjgsLNJQCMwgn3bilx5PxIlgT0Mq7qbI6YKXXRH7i7bDuuVV7ujAoWH4URKLCJ9vDNPK1K7OLzuINIuUti8Di06atuedYpG2cpx80BLIMA2ErfdDVLBxLNFTpM/tDhRtfKHCCTNnjDqYZrWH5l5al5Q2pWfgVzIQlAPP0QSKZrKnqbtpev2ifKqFag1CoWrzxl+GydPyDE2m8H31FGhGf9f2cnRMV3BXpTm/rzchJ5lV5906K/rNPwFA8hGYGmCYwsaZm3ZEclXwc01InvLtT78NCPFoY2Dp7db3OA7TzBVP/rhUwPHjdPtu1OyEA1t5Co84x8tICooftji69FDHSMKzi+KybF/v9H/pHoGpzNKw5eQvQ6kMWJDrC+0rCXSRw1DiOqZbWppRcoC9dVQAjwGzKfZDZr0/fk4HFvf7lVTdGxjMuxDt2sTSdEELlyKJGBRUwmKStFiJ9n3S4ov0Ut1Gv9FSS0/QdqIU74Gg5+7VIqwCcKXwW1SI2ZrqWonUIH7PRBW1Ei17JQSGRG4P7Ad1/VRNO3JbWsPdWFUykfdK8wtrVWwzVhN9aSEfOA3PHtA73RWNCQ6+43/UUU9xe8WQ7IQn8NlY8aW0AWW5AjXskWqiZvKX/bjFdbVrjj0GtWuEDakIkDKiTU5WahG8NQLac=
+  on:
+    tags: true
+    repo: tslovers/maths.ts
